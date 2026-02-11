@@ -33,6 +33,4 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./out/
-          server-dir: /
-          protocol: ftps
-          dangerous-clean-slate: true
+          server-dir: /htdocs/
