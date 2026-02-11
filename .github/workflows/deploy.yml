@@ -38,6 +38,6 @@ jobs:
           lftp -u "$FTP_USERNAME,$FTP_PASSWORD" "$FTP_SERVER" <<SCRIPT
           set ftp:ssl-allow yes
           set ssl:verify-certificate no
-          mirror --reverse --delete --verbose ./out/ /htdocs/
+          mirror --reverse --delete --verbose ./out/ /httpdocs/
           quit
           SCRIPT
