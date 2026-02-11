@@ -298,7 +298,7 @@ lucascmedeiros/
 - **Build:** Next.js static export (`output: 'export'`) generates a fully static `out/` directory
 - **Deploy:** GitHub Actions on push to `main` → builds → uploads via FTPS to hosting
 - **Host:** lucascmedeiros.com.br via FTPS (`ftp.lucascmedeiros.com.br`)
-- **Remote directory:** `/htdocs/`
+- **Remote directory:** `/httpdocs/`
 - **Mode:** Clean deploy (deletes remote files before uploading fresh)
 
 ### Static Export Implications
