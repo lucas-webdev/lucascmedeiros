@@ -26,6 +26,9 @@ jobs:
       - name: Build static export
         run: npm run build
 
+      - name: Install lftp
+        run: sudo apt-get update && sudo apt-get install -y lftp
+
       - name: Deploy to FTP
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
