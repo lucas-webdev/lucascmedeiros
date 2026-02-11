@@ -1,36 +1,38 @@
-name: Deploy to GitHub Pages
+name: Build and Deploy to FTP
 
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   deploy:
+    name: Build & Deploy
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: "18" # ou qualquer versão que você estiver usando
+          node-version: "20"
+          cache: "npm"
 
       - name: Install dependencies
-        run: yarn install
+        run: npm ci
 
-      - name: Build project
-        run: yarn build
+      - name: Build static export
+        run: npm run build
 
-      - name: Configure Git
-        run: |
-          git config --global user.name "${{ github.actor }}"
-          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-
-      - name: Deploy to GitHub Pages
-        run: yarn deploy
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Deploy to FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./out/
+          server-dir: /htdocs/
+          protocol: ftps
+          dangerous-clean-slate: true
