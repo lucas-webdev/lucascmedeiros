@@ -1,0 +1,161 @@
+{
+  "metadata": {
+    "title": "Lucas Medeiros — Engenheiro Frontend Sênior",
+    "description": "Engenheiro Frontend Sênior com mais de 8 anos construindo aplicações React de alta performance para empresas internacionais. Disponível para trabalho remoto."
+  },
+  "nav": {
+    "home": "Início",
+    "about": "Sobre",
+    "projects": "Projetos",
+    "blog": "Blog",
+    "resume": "Currículo",
+    "contact": "Contato"
+  },
+  "hero": {
+    "greeting": "Oi, eu sou",
+    "name": "Lucas Medeiros",
+    "title": "Engenheiro Frontend Sênior",
+    "subtitle": "Construo aplicações web de alta performance com React & TypeScript para times internacionais.",
+    "cta": "Entre em contato",
+    "resumeCta": "Ver currículo",
+    "available": "Disponível para trabalho remoto",
+    "location": "Belo Horizonte, Brasil"
+  },
+  "highlights": {
+    "title": "O que eu trago",
+    "experience": {
+      "value": "8+",
+      "label": "Anos de experiência"
+    },
+    "performance": {
+      "value": "40-70%",
+      "label": "Melhorias de performance"
+    },
+    "testing": {
+      "value": "0→90%",
+      "label": "Coberturas de teste criadas"
+    },
+    "components": {
+      "value": "20+",
+      "label": "Componentes de design system"
+    }
+  },
+  "featuredProjects": {
+    "title": "Trabalhos em destaque",
+    "viewAll": "Ver todos os projetos"
+  },
+  "cta": {
+    "title": "Vamos trabalhar juntos",
+    "description": "Estou aberto a oportunidades remotas com empresas dos EUA e internacionais. Vamos conversar sobre como posso ajudar seu time.",
+    "button": "Entre em contato"
+  },
+  "about": {
+    "title": "Sobre mim",
+    "intro": "Sou Engenheiro Frontend Sênior, moro em Belo Horizonte e tenho mais de 8 anos de experiência construindo aplicações web para empresas nos Estados Unidos, Europa e América Latina.",
+    "story": "Me especializo em React e TypeScript, com foco forte em otimização de performance, design systems e arquitetura frontend. Já liderei migrações de frameworks legados, montei infraestruturas de teste do zero e mentorei engenheiros — sempre mantendo a mão na massa com entregas de features.",
+    "remote": "Trabalho remotamente com times internacionais há anos e funciono muito bem em ambientes distribuídos e assíncronos. Me importo com qualidade, decisões técnicas bem pensadas e sistemas que escalam.",
+    "currentFocus": "Atualmente estou explorando padrões avançados de React, workflows de desenvolvimento com IA e contribuindo com a comunidade frontend.",
+    "skillsTitle": "Especialidades técnicas",
+    "timelineTitle": "Trajetória profissional",
+    "valuesTitle": "Como eu trabalho",
+    "values": {
+      "ownership": {
+        "title": "Ownership",
+        "description": "Assumo responsabilidade total pelo meu trabalho — de decisões de arquitetura até deploys em produção."
+      },
+      "pragmatism": {
+        "title": "Pragmatismo",
+        "description": "Escolho a ferramenta certa pro problema, não a mais hypada. Soluções simples que entregam vencem soluções complexas que não saem."
+      },
+      "communication": {
+        "title": "Comunicação clara",
+        "description": "Escrevo PRs detalhados, documento decisões e me comunico proativamente — especialmente trabalhando remoto."
+      },
+      "growth": {
+        "title": "Crescimento contínuo",
+        "description": "Mentoro outros devs e busco feedback ativamente. Ensinar é a melhor forma de aprofundar seu próprio conhecimento."
+      }
+    }
+  },
+  "skills": {
+    "frontend": {
+      "title": "Frontend & Arquitetura",
+      "items": "React, TypeScript, Next.js, Remix"
+    },
+    "ui": {
+      "title": "UI & Design Systems",
+      "items": "TailwindCSS, Radix UI, Material UI, Storybook, WCAG"
+    },
+    "state": {
+      "title": "Estado & Dados",
+      "items": "Redux, Jotai, REST APIs, GraphQL"
+    },
+    "testing": {
+      "title": "Testes & Qualidade",
+      "items": "Jest, Vitest, Playwright, React Testing Library"
+    },
+    "devops": {
+      "title": "DevOps & Observabilidade",
+      "items": "CI/CD, Docker, AWS, Lighthouse, Datadog, Sentry"
+    }
+  },
+  "timeline": {
+    "current": {
+      "role": "Engenheiro Frontend Sênior",
+      "company": "Somewhere LLC (Refersion)",
+      "period": "2025",
+      "description": "Reconstrui a experiência principal para lojistas de plataforma de afiliados com 600K+ pedidos/dia"
+    },
+    "montreal": {
+      "role": "Engenheiro Frontend Sênior",
+      "company": "Grupo Montreal (IPSEMG)",
+      "period": "2025",
+      "description": "Liderei frontend de plataforma crítica de saúde atendendo 2.000+ empresas"
+    },
+    "cgi": {
+      "role": "Engenheiro Frontend Sênior",
+      "company": "Growin / CGI",
+      "period": "2024",
+      "description": "Criei estratégia de testes para e-commerce enterprise (0→90% de cobertura)"
+    },
+    "emma": {
+      "role": "Engenheiro Frontend Sênior",
+      "company": "Avenue Code Portugal (Emma)",
+      "period": "2024",
+      "description": "Liderei migração Vue 2 → React/Next.js, criei design system do zero"
+    },
+    "mindera": {
+      "role": "Engenheiro Frontend",
+      "company": "Aubay Portugal (Mindera)",
+      "period": "2022–2024",
+      "description": "Otimização de performance para e-commerce com 2.000+ lojas (Lighthouse 30→78)"
+    },
+    "inter": {
+      "role": "Engenheiro Frontend",
+      "company": "Inter",
+      "period": "2021–2022",
+      "description": "Integração do PIX e padrões de design system"
+    },
+    "rock": {
+      "role": "Desenvolvedor Frontend",
+      "company": "Rock Content",
+      "period": "2020–2021",
+      "description": "Co-arquitetei plataforma SaaS greenfield com suporte a 3 mercados"
+    },
+    "earlier": {
+      "role": "Desenvolvedor Frontend",
+      "company": "Dito CRM, Avenue Code, TaskInternet",
+      "period": "2013–2020",
+      "description": "Dashboards, funis de vendas, produtos internos e desenvolvimento de CMS"
+    }
+  },
+  "footer": {
+    "rights": "Todos os direitos reservados.",
+    "builtWith": "Feito com Next.js & TypeScript"
+  },
+  "common": {
+    "switchLanguage": "English",
+    "darkMode": "Modo escuro",
+    "lightMode": "Modo claro"
+  }
+}
