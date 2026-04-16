@@ -64,7 +64,7 @@ export function ContactSection() {
           </a>
           <a
             href="mailto:lucascmedeiros.dev@gmail.com"
-            className="inline-flex items-center gap-2 rounded-md bg-accent px-6 py-3 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent/90"
+            className="inline-flex items-center gap-2 rounded-md border border-border px-6 py-3 text-sm font-medium transition-colors hover:bg-accent-muted hover:text-accent"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
