@@ -49,17 +49,17 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
 }
 ```
 
-### Routes
-All routes use **English paths** for both locales. Localized Portuguese paths (e.g., `/pt/sobre`) are not used — next-intl pathname rewriting requires middleware, which isn't available with static export.
+### Architecture: Single-page with Anchor Navigation
+The site is a single-page layout with anchor-based navigation. All sections render on `/en` or `/pt`.
 
-| Page | EN | PT |
-|------|-----|-----|
-| Home | `/en` | `/pt` |
-| About | `/en/about` | `/pt/about` |
-| Projects | `/en/projects` | `/pt/projects` |
-| Blog | `/en/blog` | `/pt/blog` |
-| Resume | `/en/resume` | `/pt/resume` |
-| Contact | `/en/contact` | `/pt/contact` |
+| Section | Anchor |
+|---------|--------|
+| Hero | `#hero` |
+| About | `#about` |
+| Skills | `#skills` |
+| Projects | `#projects` |
+| Testimonials | `#testimonials` |
+| Contact | `#contact` |
 
 ---
 
@@ -82,26 +82,22 @@ lucascmedeiros/
 │   │   ├── globals.css             # Tailwind v4 imports + theme variables
 │   │   └── [locale]/
 │   │       ├── layout.tsx          # Locale layout (next-intl provider, Header, Footer)
-│   │       ├── page.tsx            # Home (Hero, Highlights, Featured Projects, CTA)
-│   │       ├── about/page.tsx      # About (bio, skills, timeline, values)
-│   │       ├── projects/page.tsx   # Projects (placeholder)
-│   │       ├── blog/page.tsx       # Blog (placeholder)
-│   │       ├── resume/page.tsx     # Resume (placeholder)
-│   │       └── contact/page.tsx    # Contact (placeholder)
+│   │       └── page.tsx            # Single-page: Hero → About → Skills → Projects → Testimonials → Contact
 │   ├── components/
 │   │   ├── layout/
-│   │   │   ├── header.tsx          # Sticky header, nav, locale switcher, dark mode toggle, mobile menu
-│   │   │   └── footer.tsx          # Footer with social links
+│   │   │   ├── header.tsx          # Sticky header, anchor nav with scroll spy, locale switcher, dark mode, mobile menu
+│   │   │   └── footer.tsx          # Minimal footer (copyright + built with)
 │   │   ├── sections/
-│   │   │   ├── hero.tsx            # Home hero with CTAs and Framer Motion
-│   │   │   ├── highlights.tsx      # Stats grid (experience, performance, testing, components)
-│   │   │   ├── cta.tsx             # Contact call-to-action
+│   │   │   ├── hero.tsx            # Hero with photo, CTAs, and TechBackground
+│   │   │   ├── tech-background.tsx # Animated floating tech logos with cursor parallax
+│   │   │   ├── about.tsx           # Bio paragraphs (4 paragraphs)
 │   │   │   ├── skills-grid.tsx     # 5 skill category cards
-│   │   │   ├── timeline.tsx        # 8 career entries with visual timeline
-│   │   │   └── values-grid.tsx     # 4 value cards
+│   │   │   ├── projects.tsx        # 3 project cards (placeholder content)
+│   │   │   ├── testimonials.tsx    # 2 testimonial blockquotes (placeholder content)
+│   │   │   └── contact.tsx         # Social links (LinkedIn, GitHub, Email)
 │   │   └── theme-provider.tsx      # Dark mode (localStorage + system preference)
 │   ├── i18n/
-│   │   ├── routing.ts             # Locale config + pathname mappings
+│   │   ├── routing.ts             # Locale config
 │   │   ├── request.ts             # next-intl request config
 │   │   └── navigation.ts          # Locale-aware Link, useRouter, etc.
 │   └── lib/
@@ -109,7 +105,9 @@ lucascmedeiros/
 ├── messages/
 │   ├── en.json                    # English translations (complete)
 │   └── pt.json                    # Portuguese translations (complete)
-├── public/                        # Static assets (currently empty)
+├── public/
+│   └── images/
+│       └── lucas.jpg              # Profile photo
 ├── .github/workflows/deploy.yml   # Build + FTPS deploy on push to main
 ├── CLAUDE.md
 ├── next.config.ts
@@ -147,17 +145,15 @@ These Next.js features are **NOT available**:
 
 ---
 
-## Pages Status
+## Sections Status
 
-### Implemented
-- **Home** — Hero (availability dot, greeting, name, title, CTAs), Highlights (4 stat cards), Featured Projects (skeleton placeholder), CTA section
-- **About** — Bio (4 paragraphs), Skills grid (5 categories), Timeline (8 career entries with Framer Motion), Values grid (4 cards)
-
-### Placeholder ("Coming soon")
-- **Projects** — Needs 3-5 featured projects, project detail pages (MDX)
-- **Blog** — Needs MDX infrastructure, blog posts, listing page
-- **Resume** — Needs web version of resume + PDF download (EN and PT)
-- **Contact** — Needs form with spam protection
+### Implemented (single-page)
+- **Hero** — Profile photo, availability dot, greeting, name, title, CTAs (anchor to #contact), animated floating tech logos background with cursor parallax
+- **About** — Bio (4 paragraphs with Framer Motion whileInView)
+- **Skills** — 5 skill category cards with staggered scroll animations
+- **Projects** — 3 project cards (placeholder content from career highlights)
+- **Testimonials** — 2 testimonial blockquotes (placeholder content, needs real LinkedIn quotes)
+- **Contact** — Social links (LinkedIn, GitHub, Email) with CTA description
 
 ---
 
@@ -168,42 +164,30 @@ These Next.js features are **NOT available**:
 - [x] Tailwind CSS v4
 - [x] next-intl (routing, message files, locale detection)
 - [x] Layout components (Header with locale switcher + mobile menu, Footer)
-- [x] Home page (Hero, Highlights, CTA) — both locales
-- [x] About page (bio, skills, timeline, values) — both locales
 - [x] Dark mode toggle
 - [x] Static export configured
 - [x] GitHub Actions FTPS deploy workflow
 - [x] Site deployed and live
 
-### Phase 2: Portfolio & Resume
-- [ ] Projects page with 3-5 featured projects
-- [ ] Project detail pages (MDX)
-- [ ] Resume page (web version) — EN and PT
-- [ ] PDF download for resume (both languages)
+### Phase 2: Single-page Refactor — COMPLETE
+- [x] Consolidated multi-page to single-page with anchor navigation
+- [x] Hero with profile photo + animated tech background
+- [x] About, Skills, Projects, Testimonials, Contact sections
+- [x] Header scroll spy for active section highlighting
+- [x] Framer Motion scroll-triggered animations
+
+### Phase 3: Content Polish
+- [ ] Replace testimonial placeholders with real LinkedIn quotes
+- [ ] Replace project placeholders with real project details + links
+- [ ] Add PDF resume download links (EN and PT)
 - [ ] Mobile responsive polish
 
-### Phase 3: Content & Blog
-- [ ] MDX blog infrastructure
-- [ ] First 2-3 blog posts
-- [ ] Blog listing page with locale filter
-- [ ] RSS feed (per locale)
-
-### Phase 4: Polish & SEO
-- [ ] Contact form with spam protection
+### Phase 4: SEO & Analytics
 - [ ] Analytics (Plausible or similar)
 - [ ] Full accessibility audit
 - [ ] Performance optimization pass
 - [ ] SEO: structured data, sitemaps, OG images, robots.txt
 - [ ] Custom 404 page
-
-### Phase 5: Interactive Projects (post-launch)
-- [ ] Mini-project: React Performance Profiler
-- [ ] Mini-project: Design Token Generator
-- [ ] Mini-project: Remote Team Timezone Coordinator
-
-### Future Pages
-- `/now` — Current focus, availability
-- `/uses` — Dev setup, tools
 
 ---
 

@@ -4,11 +4,10 @@
     "description": "Engenheiro Frontend Sênior com mais de 8 anos construindo aplicações React de alta performance para empresas internacionais. Disponível para trabalho remoto."
   },
   "nav": {
-    "home": "Início",
     "about": "Sobre",
+    "skills": "Habilidades",
     "projects": "Projetos",
-    "blog": "Blog",
-    "resume": "Currículo",
+    "testimonials": "Depoimentos",
     "contact": "Contato"
   },
   "hero": {
@@ -19,65 +18,18 @@
     "cta": "Entre em contato",
     "resumeCta": "Ver currículo",
     "available": "Disponível para trabalho remoto",
-    "location": "Belo Horizonte, Brasil"
-  },
-  "highlights": {
-    "title": "O que eu trago",
-    "experience": {
-      "value": "8+",
-      "label": "Anos de experiência"
-    },
-    "performance": {
-      "value": "40-70%",
-      "label": "Melhorias de performance"
-    },
-    "testing": {
-      "value": "0→90%",
-      "label": "Coberturas de teste criadas"
-    },
-    "components": {
-      "value": "20+",
-      "label": "Componentes de design system"
-    }
-  },
-  "featuredProjects": {
-    "title": "Trabalhos em destaque",
-    "viewAll": "Ver todos os projetos"
-  },
-  "cta": {
-    "title": "Vamos trabalhar juntos",
-    "description": "Estou aberto a oportunidades remotas com empresas dos EUA e internacionais. Vamos conversar sobre como posso ajudar seu time.",
-    "button": "Entre em contato"
+    "location": "Belo Horizonte, Brasil",
+    "photoAlt": "Foto de Lucas Medeiros"
   },
   "about": {
     "title": "Sobre mim",
     "intro": "Sou Engenheiro Frontend Sênior, moro em Belo Horizonte e tenho mais de 8 anos de experiência construindo aplicações web para empresas nos Estados Unidos, Europa e América Latina.",
     "story": "Me especializo em React e TypeScript, com foco forte em otimização de performance, design systems e arquitetura frontend. Já liderei migrações de frameworks legados, montei infraestruturas de teste do zero e mentorei engenheiros — sempre mantendo a mão na massa com entregas de features.",
     "remote": "Trabalho remotamente com times internacionais há anos e funciono muito bem em ambientes distribuídos e assíncronos. Me importo com qualidade, decisões técnicas bem pensadas e sistemas que escalam.",
-    "currentFocus": "Atualmente estou explorando padrões avançados de React, workflows de desenvolvimento com IA e contribuindo com a comunidade frontend.",
-    "skillsTitle": "Especialidades técnicas",
-    "timelineTitle": "Trajetória profissional",
-    "valuesTitle": "Como eu trabalho",
-    "values": {
-      "ownership": {
-        "title": "Ownership",
-        "description": "Assumo responsabilidade total pelo meu trabalho — de decisões de arquitetura até deploys em produção."
-      },
-      "pragmatism": {
-        "title": "Pragmatismo",
-        "description": "Escolho a ferramenta certa pro problema, não a mais hypada. Soluções simples que entregam vencem soluções complexas que não saem."
-      },
-      "communication": {
-        "title": "Comunicação clara",
-        "description": "Escrevo PRs detalhados, documento decisões e me comunico proativamente — especialmente trabalhando remoto."
-      },
-      "growth": {
-        "title": "Crescimento contínuo",
-        "description": "Mentoro outros devs e busco feedback ativamente. Ensinar é a melhor forma de aprofundar seu próprio conhecimento."
-      }
-    }
+    "currentFocus": "Atualmente estou explorando padrões avançados de React, workflows de desenvolvimento com IA e contribuindo com a comunidade frontend."
   },
   "skills": {
+    "title": "Especialidades técnicas",
     "frontend": {
       "title": "Frontend & Arquitetura",
       "items": "React, TypeScript, Next.js, Remix"
@@ -99,55 +51,76 @@
       "items": "CI/CD, Docker, AWS, Lighthouse, Datadog, Sentry"
     }
   },
-  "timeline": {
-    "current": {
-      "role": "Engenheiro Frontend Sênior",
-      "company": "Somewhere LLC (Refersion)",
-      "period": "2025",
-      "description": "Reconstrui a experiência principal para lojistas de plataforma de afiliados com 600K+ pedidos/dia"
-    },
-    "montreal": {
-      "role": "Engenheiro Frontend Sênior",
-      "company": "Grupo Montreal (IPSEMG)",
-      "period": "2025",
-      "description": "Liderei frontend de plataforma crítica de saúde atendendo 2.000+ empresas"
-    },
-    "cgi": {
-      "role": "Engenheiro Frontend Sênior",
-      "company": "Growin / CGI",
-      "period": "2024",
-      "description": "Criei estratégia de testes para e-commerce enterprise (0→90% de cobertura)"
-    },
-    "emma": {
-      "role": "Engenheiro Frontend Sênior",
-      "company": "Avenue Code Portugal (Emma)",
-      "period": "2024",
-      "description": "Liderei migração Vue 2 → React/Next.js, criei design system do zero"
-    },
-    "mindera": {
-      "role": "Engenheiro Frontend",
-      "company": "Aubay Portugal (Mindera)",
-      "period": "2022–2024",
-      "description": "Otimização de performance para e-commerce com 2.000+ lojas (Lighthouse 30→78)"
-    },
-    "inter": {
-      "role": "Engenheiro Frontend",
-      "company": "Inter",
-      "period": "2021–2022",
-      "description": "Integração do PIX e padrões de design system"
-    },
-    "rock": {
-      "role": "Desenvolvedor Frontend",
-      "company": "Rock Content",
-      "period": "2020–2021",
-      "description": "Co-arquitetei plataforma SaaS greenfield com suporte a 3 mercados"
-    },
-    "earlier": {
-      "role": "Desenvolvedor Frontend",
-      "company": "Dito CRM, Avenue Code, TaskInternet",
-      "period": "2013–2020",
-      "description": "Dashboards, funis de vendas, produtos internos e desenvolvimento de CMS"
+  "projects": {
+    "title": "Trabalhos em destaque",
+    "items": {
+      "refersion": {
+        "name": "Reconstrução de Plataforma de Afiliados",
+        "description": "Reconstruí a experiência principal para lojistas de plataforma de afiliados com 600K+ pedidos/dia, melhorando performance e velocidade de desenvolvimento.",
+        "tags": "React, TypeScript, Next.js"
+      },
+      "healthcare": {
+        "name": "Plataforma de Saúde",
+        "description": "Liderei frontend de plataforma crítica de saúde atendendo 2.000+ empresas com processamento de dados em tempo real.",
+        "tags": "React, TypeScript, Redux"
+      },
+      "ecommerce": {
+        "name": "E-commerce Enterprise",
+        "description": "Criei estratégia de testes e otimização de performance para e-commerce com 2.000+ lojas (Lighthouse 30→78).",
+        "tags": "React, Next.js, Playwright"
+      }
     }
+  },
+  "openSource": {
+    "title": "Projetos",
+    "liveLabel": "Acessar",
+    "items": {
+      "boardgamebh": {
+        "name": "BoardGame BH",
+        "description": "Plataforma comunitária para entusiastas de jogos de tabuleiro em Belo Horizonte, ajudando jogadores a encontrar eventos, grupos e sessões de jogos.",
+        "tags": "React, TypeScript, Next.js",
+        "liveUrl": "https://bgbh.com.br",
+        "repoUrl": "https://github.com/lucas-webdev/boardgamebh"
+      },
+      "zac-esquilo": {
+        "name": "Zac Esquilo",
+        "description": "Um jogo divertido no navegador com Zac, o esquilo, criado como projeto pessoal para explorar desenvolvimento de jogos com tecnologias web.",
+        "tags": "JavaScript, HTML5, CSS",
+        "liveUrl": "https://luccascm.github.io/zac-esquilo/",
+        "repoUrl": "https://github.com/lucas-webdev/zac-esquilo"
+      },
+      "othello": {
+        "name": "Othello",
+        "description": "Jogo clássico Othello (Reversi) jogável no navegador, com oponente de IA e interface minimalista.",
+        "tags": "JavaScript, HTML5, CSS",
+        "liveUrl": "https://luccascm.github.io/othello/",
+        "repoUrl": "https://github.com/lucas-webdev/othello"
+      }
+    }
+  },
+  "testimonials": {
+    "title": "O que dizem sobre mim",
+    "items": {
+      "testimonial1": {
+        "quote": "Lucas is a very strong developer, that joined the team when it was forming, and very quickly provided lots of impact and results. His attention to execution and ideas were often not just praised by the team, but objectively valuable in generating better codebase and better functionalities. Particularly his drive in a huge frontend revamp played a fundamental role in meeting deadlines and even forecasting to stakeholders.",
+        "name": "Fernando Aires",
+        "role": "Team Manager",
+        "linkedin": "https://www.linkedin.com/in/aires/"
+      },
+      "testimonial2": {
+        "quote": "I'm glad to recommend Lucas. He is an exceptional Frontend Developer and I've had a chance to work with him alongside. What sets Lucas apart is not just his technical prowess but also his outstanding communication skills and his willingness to assist teammates. He is proactive, taking the participation in team forming questions, takes the initiative, support teammates in challenging situations. In summary, Lucas is a highly skilled and dedicated developer and you will be fortunate enough to have him.",
+        "name": "Marina Kulahina",
+        "role": "Product Manager",
+        "linkedin": "https://www.linkedin.com/in/marina-kulahina-aab91a1b8/"
+      }
+    }
+  },
+  "contact": {
+    "title": "Vamos trabalhar juntos",
+    "description": "Estou aberto a oportunidades remotas com empresas dos EUA e internacionais. Vamos conversar sobre como posso ajudar seu time.",
+    "linkedin": "LinkedIn",
+    "github": "GitHub",
+    "email": "Email"
   },
   "footer": {
     "rights": "Todos os direitos reservados.",

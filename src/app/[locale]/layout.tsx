@@ -6,7 +6,6 @@ import { routing } from "@/i18n/routing";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import "@/app/globals.css";
 
 type Props = {
   children: ReactNode;
@@ -22,10 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const t = await getTranslations({ locale, namespace: "metadata" });
 
   return {
-    title: {
-      default: t("title"),
-      template: `%s | Lucas Medeiros`,
-    },
+    title: t("title"),
     description: t("description"),
     metadataBase: new URL("https://lucascmedeiros.com.br"),
     alternates: {
@@ -52,18 +48,19 @@ export default async function LocaleLayout({ children, params }: Props) {
   const messages = await getMessages();
 
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <body className="min-h-screen bg-background text-foreground antialiased">
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <ThemeProvider>
-            <div className="flex min-h-screen flex-col">
-              <Header />
-              <main className="flex-1">{children}</main>
-              <Footer />
-            </div>
-          </ThemeProvider>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      <ThemeProvider>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `document.documentElement.lang="${locale}"`,
+          }}
+        />
+        <div className="flex min-h-screen flex-col">
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </div>
+      </ThemeProvider>
+    </NextIntlClientProvider>
   );
 }

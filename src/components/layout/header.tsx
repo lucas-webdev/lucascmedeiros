@@ -1,58 +1,84 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { Link, usePathname, useRouter } from "@/i18n/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { useTheme } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
+
+const SECTION_IDS = ["about", "skills", "projects", "testimonials", "contact"] as const;
 
 export function Header() {
   const t = useTranslations("nav");
   const tCommon = useTranslations("common");
   const locale = useLocale();
-  const pathname = usePathname();
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("");
 
-  const navItems = [
-    { href: "/about" as const, label: t("about") },
-    { href: "/projects" as const, label: t("projects") },
-    { href: "/blog" as const, label: t("blog") },
-    { href: "/resume" as const, label: t("resume") },
-    { href: "/contact" as const, label: t("contact") },
-  ];
+  const navItems = SECTION_IDS.map((id) => ({
+    href: `#${id}`,
+    label: t(id),
+    id,
+  }));
+
+  const handleScrollSpy = useCallback(() => {
+    const offset = 100;
+    let current = "";
+    for (const id of SECTION_IDS) {
+      const el = document.getElementById(id);
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        if (rect.top <= offset) {
+          current = id;
+        }
+      }
+    }
+    setActiveSection(current);
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScrollSpy, { passive: true });
+    handleScrollSpy();
+    return () => window.removeEventListener("scroll", handleScrollSpy);
+  }, [handleScrollSpy]);
 
   const switchLocale = () => {
     const nextLocale = locale === "en" ? "pt" : "en";
-    router.replace(pathname, { locale: nextLocale });
+    const hash = typeof window !== "undefined" ? window.location.hash : "";
+    router.replace("/" as never, { locale: nextLocale });
+    if (hash) {
+      requestAnimationFrame(() => {
+        window.location.hash = hash;
+      });
+    }
   };
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-sm">
       <nav className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-        <Link
-          href="/"
+        <a
+          href="#hero"
           className="text-lg font-semibold tracking-tight transition-colors hover:text-accent"
+          onClick={() => setMobileMenuOpen(false)}
         >
           LM
-        </Link>
+        </a>
 
         {/* Desktop nav */}
         <div className="hidden items-center gap-1 md:flex">
           {navItems.map((item) => (
-            <Link
-              key={item.href}
+            <a
+              key={item.id}
               href={item.href}
               className={cn(
                 "rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent-muted hover:text-accent",
-                pathname === item.href
-                  ? "text-accent"
-                  : "text-muted"
+                activeSection === item.id ? "text-accent" : "text-muted"
               )}
             >
               {item.label}
-            </Link>
+            </a>
           ))}
 
           <div className="ml-2 flex items-center gap-1 border-l border-border pl-2">
@@ -158,19 +184,17 @@ export function Header() {
         <div className="border-t border-border px-6 pb-4 md:hidden">
           <div className="flex flex-col gap-1 pt-2">
             {navItems.map((item) => (
-              <Link
-                key={item.href}
+              <a
+                key={item.id}
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
                   "rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent-muted",
-                  pathname === item.href
-                    ? "text-accent"
-                    : "text-muted"
+                  activeSection === item.id ? "text-accent" : "text-muted"
                 )}
               >
                 {item.label}
-              </Link>
+              </a>
             ))}
             <div className="mt-2 flex items-center gap-2 border-t border-border pt-2">
               <button

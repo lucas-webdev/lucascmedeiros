@@ -4,11 +4,10 @@
     "description": "Senior Frontend Engineer with 8+ years building high-performance React applications for international companies. Available for remote roles."
   },
   "nav": {
-    "home": "Home",
     "about": "About",
+    "skills": "Skills",
     "projects": "Projects",
-    "blog": "Blog",
-    "resume": "Resume",
+    "testimonials": "Testimonials",
     "contact": "Contact"
   },
   "hero": {
@@ -19,65 +18,18 @@
     "cta": "Get in touch",
     "resumeCta": "View resume",
     "available": "Available for remote roles",
-    "location": "Belo Horizonte, Brazil"
-  },
-  "highlights": {
-    "title": "What I bring to the table",
-    "experience": {
-      "value": "8+",
-      "label": "Years of experience"
-    },
-    "performance": {
-      "value": "40-70%",
-      "label": "Performance improvements"
-    },
-    "testing": {
-      "value": "0→90%",
-      "label": "Test coverage builds"
-    },
-    "components": {
-      "value": "20+",
-      "label": "Design system components"
-    }
-  },
-  "featuredProjects": {
-    "title": "Featured work",
-    "viewAll": "View all projects"
-  },
-  "cta": {
-    "title": "Let's work together",
-    "description": "I'm currently open to remote opportunities with US and international companies. Let's talk about how I can help your team.",
-    "button": "Get in touch"
+    "location": "Belo Horizonte, Brazil",
+    "photoAlt": "Photo of Lucas Medeiros"
   },
   "about": {
     "title": "About me",
     "intro": "I'm a Senior Frontend Engineer based in Belo Horizonte, Brazil, with over 8 years of experience building web applications for companies across the US, Europe, and Latin America.",
     "story": "I specialize in React and TypeScript, with a strong focus on performance optimization, design systems, and frontend architecture. I've led migrations from legacy frameworks, built testing infrastructures from scratch, and mentored engineers — all while staying hands-on with feature delivery.",
     "remote": "I've been working remotely with international teams for years, and I thrive in async-first, distributed environments. I care about shipping quality work, making thoughtful technical decisions, and building systems that scale.",
-    "currentFocus": "Currently, I'm exploring advanced React patterns, AI-assisted development workflows, and contributing to the frontend community.",
-    "skillsTitle": "Technical expertise",
-    "timelineTitle": "Career timeline",
-    "valuesTitle": "How I work",
-    "values": {
-      "ownership": {
-        "title": "Ownership",
-        "description": "I take full responsibility for my work — from architecture decisions to production deploys."
-      },
-      "pragmatism": {
-        "title": "Pragmatism",
-        "description": "I choose the right tool for the job, not the trendiest one. Simple solutions that ship beat complex ones that don't."
-      },
-      "communication": {
-        "title": "Clear communication",
-        "description": "I write detailed PRs, document decisions, and communicate proactively — especially in remote settings."
-      },
-      "growth": {
-        "title": "Continuous growth",
-        "description": "I mentor others and actively seek feedback. Teaching is the best way to deepen your own understanding."
-      }
-    }
+    "currentFocus": "Currently, I'm exploring advanced React patterns, AI-assisted development workflows, and contributing to the frontend community."
   },
   "skills": {
+    "title": "Technical expertise",
     "frontend": {
       "title": "Frontend & Architecture",
       "items": "React, TypeScript, Next.js, Remix"
@@ -99,55 +51,76 @@
       "items": "CI/CD, Docker, AWS, Lighthouse, Datadog, Sentry"
     }
   },
-  "timeline": {
-    "current": {
-      "role": "Senior Frontend Engineer",
-      "company": "Somewhere LLC (Refersion)",
-      "period": "2025",
-      "description": "Rebuilt core merchant experience for 600K+ orders/day affiliate platform"
-    },
-    "montreal": {
-      "role": "Senior Frontend Engineer",
-      "company": "Grupo Montreal (IPSEMG)",
-      "period": "2025",
-      "description": "Led frontend for mission-critical healthcare platform serving 2,000+ companies"
-    },
-    "cgi": {
-      "role": "Senior Frontend Engineer",
-      "company": "Growin / CGI",
-      "period": "2024",
-      "description": "Built testing strategy for enterprise e-commerce platform (0→90% coverage)"
-    },
-    "emma": {
-      "role": "Senior Frontend Engineer",
-      "company": "Avenue Code Portugal (Emma)",
-      "period": "2024",
-      "description": "Led Vue 2 → React/Next.js migration, built design system from scratch"
-    },
-    "mindera": {
-      "role": "Frontend Engineer",
-      "company": "Aubay Portugal (Mindera)",
-      "period": "2022–2024",
-      "description": "Performance optimization for 2,000+ store e-commerce (Lighthouse 30→78)"
-    },
-    "inter": {
-      "role": "Frontend Engineer",
-      "company": "Inter",
-      "period": "2021–2022",
-      "description": "PIX payment integration and design system standards"
-    },
-    "rock": {
-      "role": "Frontend Developer",
-      "company": "Rock Content",
-      "period": "2020–2021",
-      "description": "Co-architected greenfield SaaS platform supporting 3 markets"
-    },
-    "earlier": {
-      "role": "Frontend Developer",
-      "company": "Dito CRM, Avenue Code, TaskInternet",
-      "period": "2013–2020",
-      "description": "Dashboards, sales funnels, internal products, and CMS development"
+  "projects": {
+    "title": "Featured work",
+    "items": {
+      "refersion": {
+        "name": "Affiliate Platform Rebuild",
+        "description": "Rebuilt core merchant experience for a 600K+ orders/day affiliate platform, improving performance and developer velocity.",
+        "tags": "React, TypeScript, Next.js"
+      },
+      "healthcare": {
+        "name": "Healthcare Platform",
+        "description": "Led frontend for mission-critical healthcare platform serving 2,000+ companies with real-time data processing.",
+        "tags": "React, TypeScript, Redux"
+      },
+      "ecommerce": {
+        "name": "Enterprise E-commerce",
+        "description": "Built testing strategy and performance optimization for 2,000+ store e-commerce platform (Lighthouse 30→78).",
+        "tags": "React, Next.js, Playwright"
+      }
     }
+  },
+  "openSource": {
+    "title": "Projects",
+    "liveLabel": "Live",
+    "items": {
+      "boardgamebh": {
+        "name": "BoardGame BH",
+        "description": "Community platform for board game enthusiasts in Belo Horizonte, helping players find events, groups, and game sessions.",
+        "tags": "React, TypeScript, Next.js",
+        "liveUrl": "https://bgbh.com.br",
+        "repoUrl": "https://github.com/lucas-webdev/boardgamebh"
+      },
+      "zac-esquilo": {
+        "name": "Zac Esquilo",
+        "description": "A fun browser-based game featuring Zac the squirrel, built as a side project to explore game development with web technologies.",
+        "tags": "JavaScript, HTML5, CSS",
+        "liveUrl": "https://luccascm.github.io/zac-esquilo/",
+        "repoUrl": "https://github.com/lucas-webdev/zac-esquilo"
+      },
+      "othello": {
+        "name": "Othello",
+        "description": "Classic Othello (Reversi) board game playable in the browser, with AI opponent and clean minimalist interface.",
+        "tags": "JavaScript, HTML5, CSS",
+        "liveUrl": "https://luccascm.github.io/othello/",
+        "repoUrl": "https://github.com/lucas-webdev/othello"
+      }
+    }
+  },
+  "testimonials": {
+    "title": "What people say",
+    "items": {
+      "testimonial1": {
+        "quote": "Lucas is a very strong developer, that joined the team when it was forming, and very quickly provided lots of impact and results. His attention to execution and ideas were often not just praised by the team, but objectively valuable in generating better codebase and better functionalities. Particularly his drive in a huge frontend revamp played a fundamental role in meeting deadlines and even forecasting to stakeholders.",
+        "name": "Fernando Aires",
+        "role": "Team Manager",
+        "linkedin": "https://www.linkedin.com/in/aires/"
+      },
+      "testimonial2": {
+        "quote": "I'm glad to recommend Lucas. He is an exceptional Frontend Developer and I've had a chance to work with him alongside. What sets Lucas apart is not just his technical prowess but also his outstanding communication skills and his willingness to assist teammates. He is proactive, taking the participation in team forming questions, takes the initiative, support teammates in challenging situations. In summary, Lucas is a highly skilled and dedicated developer and you will be fortunate enough to have him.",
+        "name": "Marina Kulahina",
+        "role": "Product Manager",
+        "linkedin": "https://www.linkedin.com/in/marina-kulahina-aab91a1b8/"
+      }
+    }
+  },
+  "contact": {
+    "title": "Let's work together",
+    "description": "I'm currently open to remote opportunities with US and international companies. Let's talk about how I can help your team.",
+    "linkedin": "LinkedIn",
+    "github": "GitHub",
+    "email": "Email"
   },
   "footer": {
     "rights": "All rights reserved.",
