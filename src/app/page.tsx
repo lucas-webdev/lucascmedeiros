@@ -7,6 +7,7 @@ import { Footer } from "@/components/layout/footer";
 import { HeroSection } from "@/components/sections/hero";
 import { AboutSection } from "@/components/sections/about";
 import { SkillsSection } from "@/components/sections/skills-grid";
+import { ExperienceSection } from "@/components/sections/experience";
 import { ProjectsSection } from "@/components/sections/projects";
 import { OpenSourceSection } from "@/components/sections/open-source";
 import { TestimonialsSection } from "@/components/sections/testimonials";
@@ -49,6 +50,7 @@ export default async function RootPage() {
             <HeroSection />
             <AboutSection />
             <SkillsSection />
+            <ExperienceSection />
             <ProjectsSection />
             <OpenSourceSection />
             <TestimonialsSection />

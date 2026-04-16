@@ -9,8 +9,19 @@ export function ProjectsSection() {
   const t = useTranslations("projects");
 
   return (
-    <section id="projects" className="py-20 md:py-28">
-      <div className="mx-auto max-w-5xl px-6">
+    <section
+      id="projects"
+      className="relative py-28 md:py-40"
+      style={{
+        backgroundImage: "url('/images/dev-bg-2.png')",
+        backgroundAttachment: "fixed",
+        backgroundPosition: "center",
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
+      <div className="absolute inset-0 bg-background/85 dark:bg-background/90" />
+      <div className="relative mx-auto max-w-5xl px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

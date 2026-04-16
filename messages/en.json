@@ -6,6 +6,7 @@
   "nav": {
     "about": "About",
     "skills": "Skills",
+    "experience": "Experience",
     "projects": "Projects",
     "testimonials": "Testimonials",
     "contact": "Contact"
@@ -49,6 +50,60 @@
     "devops": {
       "title": "DevOps & Observability",
       "items": "CI/CD, Docker, AWS, Lighthouse, Datadog, Sentry"
+    }
+  },
+  "experience": {
+    "title": "Experience",
+    "subtitle": "8+ years building for companies across the US, Europe, and Latin America.",
+    "items": {
+      "current": {
+        "role": "Senior Frontend Engineer",
+        "company": "Somewhere LLC (Refersion)",
+        "period": "2025",
+        "description": "Rebuilt core merchant experience for 600K+ orders/day affiliate platform"
+      },
+      "montreal": {
+        "role": "Senior Frontend Engineer",
+        "company": "Grupo Montreal (IPSEMG)",
+        "period": "2025",
+        "description": "Led frontend for mission-critical healthcare platform serving 2,000+ companies"
+      },
+      "cgi": {
+        "role": "Senior Frontend Engineer",
+        "company": "Growin / CGI",
+        "period": "2024",
+        "description": "Built testing strategy for enterprise e-commerce platform (0\u219290% coverage)"
+      },
+      "emma": {
+        "role": "Senior Frontend Engineer",
+        "company": "Avenue Code Portugal (Emma)",
+        "period": "2024",
+        "description": "Led Vue 2 \u2192 React/Next.js migration, built design system from scratch"
+      },
+      "mindera": {
+        "role": "Frontend Engineer",
+        "company": "Aubay Portugal (Mindera)",
+        "period": "2022\u20132024",
+        "description": "Performance optimization for 2,000+ store e-commerce (Lighthouse 30\u219278)"
+      },
+      "inter": {
+        "role": "Frontend Engineer",
+        "company": "Inter",
+        "period": "2021\u20132022",
+        "description": "PIX payment integration and design system standards"
+      },
+      "rock": {
+        "role": "Frontend Developer",
+        "company": "Rock Content",
+        "period": "2020\u20132021",
+        "description": "Co-architected greenfield SaaS platform supporting 3 markets"
+      },
+      "earlier": {
+        "role": "Frontend Developer",
+        "company": "Dito CRM, Avenue Code, TaskInternet",
+        "period": "2013\u20132020",
+        "description": "Dashboards, sales funnels, internal products, and CMS development"
+      }
     }
   },
   "projects": {

@@ -6,7 +6,7 @@ import { useRouter } from "@/i18n/navigation";
 import { useTheme } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
 
-const SECTION_IDS = ["about", "skills", "projects", "testimonials", "contact"] as const;
+const SECTION_IDS = ["about", "skills", "experience", "projects", "testimonials", "contact"] as const;
 
 export function Header() {
   const t = useTranslations("nav");

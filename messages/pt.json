@@ -6,6 +6,7 @@
   "nav": {
     "about": "Sobre",
     "skills": "Habilidades",
+    "experience": "Experiência",
     "projects": "Projetos",
     "testimonials": "Depoimentos",
     "contact": "Contato"
@@ -49,6 +50,60 @@
     "devops": {
       "title": "DevOps & Observabilidade",
       "items": "CI/CD, Docker, AWS, Lighthouse, Datadog, Sentry"
+    }
+  },
+  "experience": {
+    "title": "Experiência",
+    "subtitle": "8+ anos construindo para empresas nos EUA, Europa e América Latina.",
+    "items": {
+      "current": {
+        "role": "Engenheiro Frontend Sênior",
+        "company": "Somewhere LLC (Refersion)",
+        "period": "2025",
+        "description": "Reconstrui a experiência principal para lojistas de plataforma de afiliados com 600K+ pedidos/dia"
+      },
+      "montreal": {
+        "role": "Engenheiro Frontend Sênior",
+        "company": "Grupo Montreal (IPSEMG)",
+        "period": "2025",
+        "description": "Liderei frontend de plataforma crítica de saúde atendendo 2.000+ empresas"
+      },
+      "cgi": {
+        "role": "Engenheiro Frontend Sênior",
+        "company": "Growin / CGI",
+        "period": "2024",
+        "description": "Criei estratégia de testes para e-commerce enterprise (0\u219290% de cobertura)"
+      },
+      "emma": {
+        "role": "Engenheiro Frontend Sênior",
+        "company": "Avenue Code Portugal (Emma)",
+        "period": "2024",
+        "description": "Liderei migração Vue 2 \u2192 React/Next.js, criei design system do zero"
+      },
+      "mindera": {
+        "role": "Engenheiro Frontend",
+        "company": "Aubay Portugal (Mindera)",
+        "period": "2022\u20132024",
+        "description": "Otimização de performance para e-commerce com 2.000+ lojas (Lighthouse 30\u219278)"
+      },
+      "inter": {
+        "role": "Engenheiro Frontend",
+        "company": "Inter",
+        "period": "2021\u20132022",
+        "description": "Integração do PIX e padrões de design system"
+      },
+      "rock": {
+        "role": "Desenvolvedor Frontend",
+        "company": "Rock Content",
+        "period": "2020\u20132021",
+        "description": "Co-arquitetei plataforma SaaS greenfield com suporte a 3 mercados"
+      },
+      "earlier": {
+        "role": "Desenvolvedor Frontend",
+        "company": "Dito CRM, Avenue Code, TaskInternet",
+        "period": "2013\u20132020",
+        "description": "Dashboards, funis de vendas, produtos internos e desenvolvimento de CMS"
+      }
     }
   },
   "projects": {
