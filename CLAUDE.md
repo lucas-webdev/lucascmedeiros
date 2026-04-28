@@ -57,9 +57,13 @@ The site is a single-page layout with anchor-based navigation. All sections rend
 | Hero | `#hero` |
 | About | `#about` |
 | Skills | `#skills` |
+| Experience | `#experience` |
 | Projects | `#projects` |
+| Open Source | `#open-source` |
 | Testimonials | `#testimonials` |
 | Contact | `#contact` |
+
+Header scroll-spy tracks: about, skills, experience, projects, testimonials, contact (open-source is not in the header nav).
 
 ---
 
@@ -82,7 +86,7 @@ lucascmedeiros/
 │   │   ├── globals.css             # Tailwind v4 imports + theme variables
 │   │   └── [locale]/
 │   │       ├── layout.tsx          # Locale layout (next-intl provider, Header, Footer)
-│   │       └── page.tsx            # Single-page: Hero → About → Skills → Projects → Testimonials → Contact
+│   │       └── page.tsx            # Single-page: Hero → About → Skills → Experience → Projects → OpenSource → Testimonials → Contact
 │   ├── components/
 │   │   ├── layout/
 │   │   │   ├── header.tsx          # Sticky header, anchor nav with scroll spy, locale switcher, dark mode, mobile menu
@@ -92,8 +96,10 @@ lucascmedeiros/
 │   │   │   ├── tech-background.tsx # Animated floating tech logos with cursor parallax
 │   │   │   ├── about.tsx           # Bio paragraphs (4 paragraphs)
 │   │   │   ├── skills-grid.tsx     # 5 skill category cards
-│   │   │   ├── projects.tsx        # 3 project cards (placeholder content)
-│   │   │   ├── testimonials.tsx    # 2 testimonial blockquotes (placeholder content)
+│   │   │   ├── experience.tsx     # Timeline of 8 career entries with real company data
+│   │   │   ├── projects.tsx        # 3 project cards with real career highlights
+│   │   │   ├── open-source.tsx    # 3 open-source projects with live/repo links
+│   │   │   ├── testimonials.tsx    # 2 testimonial blockquotes with real LinkedIn quotes
 │   │   │   └── contact.tsx         # Social links (LinkedIn, GitHub, Email)
 │   │   └── theme-provider.tsx      # Dark mode (localStorage + system preference)
 │   ├── i18n/
@@ -107,7 +113,9 @@ lucascmedeiros/
 │   └── pt.json                    # Portuguese translations (complete)
 ├── public/
 │   └── images/
-│       └── lucas.jpg              # Profile photo
+│       ├── lucas.jpg              # Profile photo
+│       ├── dev-bg-1.png           # Skills section fixed background
+│       └── dev-bg-2.png           # Projects section fixed background
 ├── .github/workflows/deploy.yml   # Build + FTPS deploy on push to main
 ├── CLAUDE.md
 ├── next.config.ts
@@ -147,12 +155,14 @@ These Next.js features are **NOT available**:
 
 ## Sections Status
 
-### Implemented (single-page)
+### Implemented (single-page, all with real content)
 - **Hero** — Profile photo, availability dot, greeting, name, title, CTAs (anchor to #contact), animated floating tech logos background with cursor parallax
 - **About** — Bio (4 paragraphs with Framer Motion whileInView)
-- **Skills** — 5 skill category cards with staggered scroll animations
-- **Projects** — 3 project cards (placeholder content from career highlights)
-- **Testimonials** — 2 testimonial blockquotes (placeholder content, needs real LinkedIn quotes)
+- **Skills** — 5 skill category cards with staggered scroll animations, fixed background image
+- **Experience** — Timeline of 8 career entries (Refersion, IPSEMG, CGI, Emma, Mindera, Inter, Rock Content, earlier roles)
+- **Projects** — 3 project cards with real career highlight descriptions (Refersion, Healthcare Platform, E-commerce)
+- **Open Source** — 3 open-source projects with live URLs and repo links (BoardGame BH, Zac Esquilo, Othello)
+- **Testimonials** — 2 real testimonial blockquotes with LinkedIn links (Fernando Aires, Marina Kulahina)
 - **Contact** — Social links (LinkedIn, GitHub, Email) with CTA description
 
 ---
@@ -175,10 +185,13 @@ These Next.js features are **NOT available**:
 - [x] About, Skills, Projects, Testimonials, Contact sections
 - [x] Header scroll spy for active section highlighting
 - [x] Framer Motion scroll-triggered animations
+- [x] Experience timeline section with 8 real career entries
+- [x] Open Source section with 3 projects and live links
+- [x] Background images for Skills and Projects sections
 
-### Phase 3: Content Polish
-- [ ] Replace testimonial placeholders with real LinkedIn quotes
-- [ ] Replace project placeholders with real project details + links
+### Phase 3: Content Polish — MOSTLY COMPLETE
+- [x] Replace testimonial placeholders with real LinkedIn quotes
+- [x] Replace project placeholders with real project details
 - [ ] Add PDF resume download links (EN and PT)
 - [ ] Mobile responsive polish
 

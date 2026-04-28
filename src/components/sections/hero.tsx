@@ -69,7 +69,7 @@ export function HeroSection() {
             alt={t("photoAlt")}
             width={240}
             height={240}
-            className="h-48 w-48 rounded-full border-4 border-accent/20 object-cover shadow-lg md:h-60 md:w-60"
+            className="h-48 w-48 rounded-full border-4 border-accent/20 shadow-lg md:h-60 md:w-60"
           />
         </motion.div>
       </div>
