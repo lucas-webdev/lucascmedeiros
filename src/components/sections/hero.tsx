@@ -30,7 +30,7 @@ export function HeroSection() {
           </div>
 
           <p className="text-lg text-muted">{t("greeting")}</p>
-          <h1 className="mt-1 text-4xl font-bold tracking-tight md:text-6xl">
+          <h1 className="mt-1 text-4xl font-bold tracking-tight text-white md:text-6xl">
             {t("name")}
           </h1>
           <p className="mt-2 text-xl font-medium text-accent md:text-2xl">
@@ -49,7 +49,7 @@ export function HeroSection() {
             </a>
             <a
               href="#about"
-              className="inline-flex items-center rounded-md border border-border px-6 py-3 text-sm font-medium transition-colors hover:bg-accent-muted hover:text-accent"
+              className="inline-flex items-center rounded-md border border-white/20 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-white/10"
             >
               {t("resumeCta")}
             </a>
@@ -65,10 +65,10 @@ export function HeroSection() {
           transition={{ duration: 0.5, delay: 0.2 }}
         >
           <img
-            src="/images/lucas.jpg"
+            src="/images/lucas.webp"
             alt={t("photoAlt")}
-            width={240}
-            height={240}
+            width={480}
+            height={480}
             className="h-48 w-48 rounded-full border-4 border-accent/20 shadow-lg md:h-60 md:w-60"
           />
         </motion.div>

@@ -5,7 +5,8 @@
       "Bash(npm install:*)",
       "Bash(npm run build:*)",
       "Bash(timeout:*)",
-      "Bash(ping:*)"
+      "Bash(ping:*)",
+      "Bash(npx sharp-cli:*)"
     ]
   }
 }

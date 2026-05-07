@@ -19,7 +19,7 @@ export function SkillsSection() {
       id="skills"
       className="relative py-28 md:py-40"
       style={{
-        backgroundImage: "url('/images/dev-bg-1.png')",
+        backgroundImage: "url('/images/dev-bg-1.webp')",
         backgroundAttachment: "fixed",
         backgroundPosition: "center",
         backgroundSize: "cover",

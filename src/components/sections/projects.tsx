@@ -13,7 +13,7 @@ export function ProjectsSection() {
       id="projects"
       className="relative py-28 md:py-40"
       style={{
-        backgroundImage: "url('/images/dev-bg-2.png')",
+        backgroundImage: "url('/images/dev-bg-2.webp')",
         backgroundAttachment: "fixed",
         backgroundPosition: "center",
         backgroundSize: "cover",
