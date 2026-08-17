@@ -28,6 +28,9 @@ yarn-error.log*
 .env
 .env*.local
 
+# futebol api secrets (generated at deploy time from GitHub Secrets)
+public/api/config.php
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

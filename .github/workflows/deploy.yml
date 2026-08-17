@@ -23,6 +23,23 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Write futebol API config
+        env:
+          FUTEBOL_DB_HOST: ${{ secrets.FUTEBOL_DB_HOST }}
+          FUTEBOL_DB_NAME: ${{ secrets.FUTEBOL_DB_NAME }}
+          FUTEBOL_DB_USER: ${{ secrets.FUTEBOL_DB_USER }}
+          FUTEBOL_DB_PASSWORD: ${{ secrets.FUTEBOL_DB_PASSWORD }}
+          FUTEBOL_PIN: ${{ secrets.FUTEBOL_PIN }}
+        run: |
+          cat > public/api/config.php <<PHP
+          <?php
+          define('DB_HOST', '$FUTEBOL_DB_HOST');
+          define('DB_NAME', '$FUTEBOL_DB_NAME');
+          define('DB_USER', '$FUTEBOL_DB_USER');
+          define('DB_PASS', '$FUTEBOL_DB_PASSWORD');
+          define('ADMIN_PIN', '$FUTEBOL_PIN');
+          PHP
+
       - name: Build static export
         run: npm run build
 
