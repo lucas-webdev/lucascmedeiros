@@ -2,7 +2,9 @@
 
 import { cn } from "@/lib/utils";
 import type { JogadorPresente } from "@/lib/futebol-types";
+import { visualDoTime } from "@/lib/futebol-teams";
 import { Stepper } from "./stepper";
+import { VestIcon } from "./vest-icon";
 
 interface PresentPlayersProps {
   jogadores: JogadorPresente[];
@@ -12,15 +14,6 @@ interface PresentPlayersProps {
     valor: number
   ) => void;
 }
-
-const CORES_TIME: Record<number, string> = {
-  1: "bg-blue-500 text-white",
-  2: "bg-emerald-500 text-white",
-  3: "bg-amber-500 text-white",
-  4: "bg-purple-500 text-white",
-  5: "bg-pink-500 text-white",
-  6: "bg-cyan-500 text-white",
-};
 
 export function PresentPlayers({ jogadores, onChangeStat }: PresentPlayersProps) {
   if (jogadores.length === 0) {
@@ -71,12 +64,12 @@ export function PresentPlayers({ jogadores, onChangeStat }: PresentPlayersProps)
                 {jogador.timeNumero ? (
                   <span
                     className={cn(
-                      "rounded-full px-2 py-0.5 text-xs font-medium",
-                      CORES_TIME[jogador.timeNumero] ??
-                        "bg-white/20 text-white"
+                      "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium",
+                      visualDoTime(jogador.timeNumero).corBadge
                     )}
                   >
-                    Time {jogador.timeNumero}
+                    <VestIcon className="h-3 w-3 shrink-0" />
+                    {visualDoTime(jogador.timeNumero).nome}
                   </span>
                 ) : (
                   <span className="text-xs text-white/40">—</span>

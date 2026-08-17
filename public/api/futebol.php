@@ -107,10 +107,15 @@ try {
     }
 
     if ($method === 'GET' && $action === 'ranking') {
+        // Desempate por aproveitamento (gols+assistências / jogos) — mantido
+        // em sincronia com o critério usado em ranking-table.tsx no front-end,
+        // que é quem de fato decide a ordem exibida.
         $stmt = $pdo->query(
             'SELECT id, nome, mensalista, pontos, jogos, gols, assistencias
              FROM jogadores WHERE ativo = 1
-             ORDER BY pontos DESC, jogos DESC, gols DESC, nome ASC'
+             ORDER BY pontos DESC,
+                      (CASE WHEN jogos > 0 THEN (gols + assistencias) / jogos ELSE 0 END) DESC,
+                      nome ASC'
         );
         json_out(['jogadores' => $stmt->fetchAll()]);
     }

@@ -2,6 +2,8 @@
 
 import { useId } from "react";
 import type { JogadorPresente } from "@/lib/futebol-types";
+import { visualDoTime } from "@/lib/futebol-teams";
+import { VestIcon } from "./vest-icon";
 
 interface TeamDrawProps {
   presentesCount: number;
@@ -11,15 +13,6 @@ interface TeamDrawProps {
   times: Record<number, number[]>;
   jogadoresPorId: Map<number, JogadorPresente>;
 }
-
-const COR_TEXTO_TIME: Record<number, string> = {
-  1: "text-blue-400",
-  2: "text-emerald-400",
-  3: "text-amber-400",
-  4: "text-purple-400",
-  5: "text-pink-400",
-  6: "text-cyan-400",
-};
 
 export function TeamDraw({
   presentesCount,
@@ -72,25 +65,27 @@ export function TeamDraw({
 
       {temTimes && (
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Object.entries(times).map(([time, ids]) => (
-            <div
-              key={time}
-              className="rounded-md border border-white/10 bg-white/5 p-3"
-            >
-              <h3
-                className={`text-sm font-semibold ${
-                  COR_TEXTO_TIME[Number(time)] ?? "text-white"
-                }`}
+          {Object.entries(times).map(([time, ids]) => {
+            const visual = visualDoTime(Number(time));
+            return (
+              <div
+                key={time}
+                className="rounded-md border border-white/10 bg-white/5 p-3"
               >
-                Time {time}
-              </h3>
-              <ul className="mt-2 space-y-1 text-sm text-white">
-                {ids.map((id) => (
-                  <li key={id}>{jogadoresPorId.get(id)?.nome ?? id}</li>
-                ))}
-              </ul>
-            </div>
-          ))}
+                <h3
+                  className={`flex items-center gap-1.5 text-sm font-semibold ${visual.corTexto}`}
+                >
+                  <VestIcon className="h-4 w-4 shrink-0" />
+                  {visual.nome}
+                </h3>
+                <ul className="mt-2 space-y-1 text-sm text-white">
+                  {ids.map((id) => (
+                    <li key={id}>{jogadoresPorId.get(id)?.nome ?? id}</li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
