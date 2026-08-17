@@ -16,14 +16,14 @@ export function AttendanceList({
   const presentesSet = new Set(presentesIds);
 
   return (
-    <fieldset className="rounded-lg border border-border bg-card p-4">
-      <legend className="px-1 text-sm font-semibold">
+    <fieldset className="rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
+      <legend className="px-1 text-sm font-semibold text-white/80">
         Lista geral — marque quem está presente hoje
       </legend>
       {jogadores.length === 0 ? (
-        <p className="mt-2 text-sm text-muted">Nenhum jogador cadastrado.</p>
+        <p className="mt-2 text-sm text-white/60">Nenhum jogador cadastrado.</p>
       ) : (
-        <ul className="mt-3 divide-y divide-border">
+        <ul className="mt-3 divide-y divide-white/10">
           {jogadores.map((jogador) => {
             const checked = presentesSet.has(jogador.id);
             const inputId = `presenca-${jogador.id}`;
@@ -34,18 +34,18 @@ export function AttendanceList({
                   type="checkbox"
                   checked={checked}
                   onChange={() => onToggle(jogador.id)}
-                  className="h-5 w-5 shrink-0 rounded border-border text-accent"
+                  className="h-5 w-5 shrink-0 rounded border-white/30 bg-white/10 accent-[#2F4FE0]"
                 />
                 <label
                   htmlFor={inputId}
-                  className="flex flex-1 items-center gap-1.5 py-1 text-sm"
+                  className="flex flex-1 items-center gap-1.5 py-1 text-sm text-white"
                 >
                   {jogador.nome}
                   {jogador.mensalista && (
                     <span
                       aria-label="Mensalista"
                       title="Mensalista"
-                      className="text-accent"
+                      className="text-amber-400"
                     >
                       ★
                     </span>

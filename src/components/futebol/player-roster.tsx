@@ -70,8 +70,8 @@ export function PlayerRoster({
   };
 
   return (
-    <details className="rounded-lg border border-border bg-card p-4">
-      <summary className="cursor-pointer text-sm font-semibold">
+    <details className="rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
+      <summary className="cursor-pointer text-sm font-semibold text-white/80">
         Gerenciar elenco
       </summary>
 
@@ -80,7 +80,7 @@ export function PlayerRoster({
         className="mt-4 flex flex-wrap items-end gap-3"
       >
         <div className="min-w-[180px] flex-1">
-          <label htmlFor="novo-jogador-nome" className="block text-sm font-medium">
+          <label htmlFor="novo-jogador-nome" className="block text-sm font-medium text-white/80">
             Nome
           </label>
           <input
@@ -88,54 +88,54 @@ export function PlayerRoster({
             type="text"
             value={nome}
             onChange={(e) => setNome(e.target.value)}
-            className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+            className="mt-1 w-full rounded-md border border-white/20 bg-white/10 px-3 py-2 text-sm text-white placeholder:text-white/40"
             placeholder="Nome do jogador"
           />
         </div>
-        <label className="flex items-center gap-2 pb-2 text-sm">
+        <label className="flex items-center gap-2 pb-2 text-sm text-white/80">
           <input
             type="checkbox"
             checked={mensalista}
             onChange={(e) => setMensalista(e.target.checked)}
-            className="h-4 w-4"
+            className="h-4 w-4 accent-[#2F4FE0]"
           />
           Mensalista
         </label>
         <button
           type="submit"
           disabled={enviando || !nome.trim()}
-          className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-foreground disabled:cursor-not-allowed disabled:opacity-40"
+          className="rounded-md bg-[#2F4FE0] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#2643C8] disabled:cursor-not-allowed disabled:opacity-40"
         >
           Adicionar
         </button>
       </form>
 
       {erro && (
-        <p role="alert" className="mt-2 text-sm text-red-600">
+        <p role="alert" className="mt-2 text-sm text-red-300">
           {erro}
         </p>
       )}
 
-      <ul className="mt-4 divide-y divide-border">
+      <ul className="mt-4 divide-y divide-white/10">
         {jogadores.map((jogador) => (
           <li
             key={jogador.id}
-            className="flex flex-wrap items-center gap-3 py-2 text-sm"
+            className="flex flex-wrap items-center gap-3 py-2 text-sm text-white"
           >
             <span className="flex-1">{jogador.nome}</span>
-            <label className="flex items-center gap-1.5 text-xs text-muted">
+            <label className="flex items-center gap-1.5 text-xs text-white/60">
               <input
                 type="checkbox"
                 checked={jogador.mensalista}
                 onChange={() => handleToggleMensalista(jogador)}
-                className="h-4 w-4"
+                className="h-4 w-4 accent-[#2F4FE0]"
               />
               Mensalista
             </label>
             <button
               type="button"
               onClick={() => handleRemover(jogador)}
-              className="text-xs text-red-600 hover:underline"
+              className="text-xs text-red-400 hover:underline"
             >
               Remover
             </button>

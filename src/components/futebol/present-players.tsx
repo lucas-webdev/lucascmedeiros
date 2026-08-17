@@ -14,28 +14,28 @@ interface PresentPlayersProps {
 }
 
 const CORES_TIME: Record<number, string> = {
-  1: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300",
-  2: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
-  3: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
-  4: "bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300",
-  5: "bg-pink-100 text-pink-800 dark:bg-pink-950 dark:text-pink-300",
-  6: "bg-cyan-100 text-cyan-800 dark:bg-cyan-950 dark:text-cyan-300",
+  1: "bg-blue-500 text-white",
+  2: "bg-emerald-500 text-white",
+  3: "bg-amber-500 text-white",
+  4: "bg-purple-500 text-white",
+  5: "bg-pink-500 text-white",
+  6: "bg-cyan-500 text-white",
 };
 
 export function PresentPlayers({ jogadores, onChangeStat }: PresentPlayersProps) {
   if (jogadores.length === 0) {
     return (
-      <p className="rounded-lg border border-border bg-card p-4 text-sm text-muted">
+      <p className="rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-white/60 backdrop-blur-sm">
         Nenhum jogador confirmado ainda.
       </p>
     );
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-border bg-card">
+    <div className="overflow-x-auto rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted">
+          <tr className="border-b border-white/10 text-left text-xs uppercase tracking-wide text-white/50">
             <th scope="col" className="px-4 py-3">
               Jogador
             </th>
@@ -50,17 +50,17 @@ export function PresentPlayers({ jogadores, onChangeStat }: PresentPlayersProps)
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-border">
+        <tbody className="divide-y divide-white/10">
           {jogadores.map((jogador) => (
             <tr key={jogador.id}>
               <td className="px-4 py-3">
-                <span className="flex items-center gap-1.5">
+                <span className="flex items-center gap-1.5 text-white">
                   {jogador.nome}
                   {jogador.mensalista && (
                     <span
                       aria-label="Mensalista"
                       title="Mensalista"
-                      className="text-accent"
+                      className="text-amber-400"
                     >
                       ★
                     </span>
@@ -73,13 +73,13 @@ export function PresentPlayers({ jogadores, onChangeStat }: PresentPlayersProps)
                     className={cn(
                       "rounded-full px-2 py-0.5 text-xs font-medium",
                       CORES_TIME[jogador.timeNumero] ??
-                        "bg-muted text-foreground"
+                        "bg-white/20 text-white"
                     )}
                   >
                     Time {jogador.timeNumero}
                   </span>
                 ) : (
-                  <span className="text-xs text-muted">—</span>
+                  <span className="text-xs text-white/40">—</span>
                 )}
               </td>
               <td className="px-4 py-3">

@@ -2,11 +2,9 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { ThemeProvider, useTheme } from "@/components/theme-provider";
 import {
   FutebolApiError,
   getPlayers,
-  getRanking,
   submitMatch,
 } from "@/lib/futebol-api";
 import {
@@ -24,33 +22,31 @@ import { AttendanceList } from "./attendance-list";
 import { PresentPlayers } from "./present-players";
 import { TeamDraw } from "./team-draw";
 import { Scoreboard } from "./scoreboard";
-import { RankingTable } from "./ranking-table";
+import { RankingSection } from "./ranking-section";
 
-function ThemeToggleButton() {
-  const { theme, toggleTheme } = useTheme();
+function Wordmark({ className = "" }: { className?: string }) {
   return (
-    <button
-      type="button"
-      onClick={toggleTheme}
-      className="rounded-md border border-border p-2 text-muted transition-colors hover:bg-accent-muted hover:text-accent"
-      aria-label={theme === "light" ? "Ativar modo escuro" : "Ativar modo claro"}
-    >
-      {theme === "light" ? "🌙" : "☀️"}
-    </button>
+    <span className={`font-semibold tracking-tight ${className}`}>
+      igreja<span className="font-black">onda</span>
+    </span>
   );
 }
 
 interface FutebolContentProps {
   pin: string;
   onAuthError: () => void;
+  onDadosAtualizados: () => void;
 }
 
-function FutebolContent({ pin, onAuthError }: FutebolContentProps) {
+function FutebolContent({
+  pin,
+  onAuthError,
+  onDadosAtualizados,
+}: FutebolContentProps) {
   const [pronto, setPronto] = useState(false);
   const [draft, setDraft] = useState<PeladaDraft | null>(null);
 
   const [jogadores, setJogadores] = useState<Jogador[]>([]);
-  const [ranking, setRanking] = useState<Jogador[]>([]);
   const [carregandoJogadores, setCarregandoJogadores] = useState(true);
   const [erroCarregamento, setErroCarregamento] = useState<string | null>(null);
 
@@ -59,7 +55,6 @@ function FutebolContent({ pin, onAuthError }: FutebolContentProps) {
   const [sucessoEnvio, setSucessoEnvio] = useState(false);
 
   useEffect(() => {
-    document.documentElement.lang = "pt";
     const data = hojeISO();
     setDraft(carregarDraft(data) ?? criarDraftVazio(data));
     setPronto(true);
@@ -73,12 +68,8 @@ function FutebolContent({ pin, onAuthError }: FutebolContentProps) {
 
   const recarregarJogadores = useCallback(async () => {
     try {
-      const [jogadoresResp, rankingResp] = await Promise.all([
-        getPlayers(),
-        getRanking(),
-      ]);
+      const jogadoresResp = await getPlayers();
       setJogadores(jogadoresResp);
-      setRanking(rankingResp);
       setErroCarregamento(null);
     } catch (e) {
       setErroCarregamento(
@@ -118,7 +109,7 @@ function FutebolContent({ pin, onAuthError }: FutebolContentProps) {
 
   if (!pronto || !draft) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center text-sm text-muted">
+      <div className="flex min-h-[30vh] items-center justify-center text-sm text-white/60">
         Carregando...
       </div>
     );
@@ -230,6 +221,7 @@ function FutebolContent({ pin, onAuthError }: FutebolContentProps) {
       setDraft(criarDraftVazio(draft.data));
       setSucessoEnvio(true);
       await recarregarJogadores();
+      onDadosAtualizados();
     } catch (e) {
       if (e instanceof FutebolApiError && e.status === 401) {
         onAuthError();
@@ -241,33 +233,24 @@ function FutebolContent({ pin, onAuthError }: FutebolContentProps) {
     }
   };
 
-  return (
-    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
-      <header className="flex items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold">Futebol Onda BH</h1>
-          <Link href="/" className="text-xs text-muted hover:text-accent hover:underline">
-            ← Voltar ao site
-          </Link>
-        </div>
-        <ThemeToggleButton />
-      </header>
+  const handleRosterChanged = () => {
+    recarregarJogadores();
+    onDadosAtualizados();
+  };
 
+  return (
+    <div>
       {erroCarregamento && (
-        <p role="alert" className="mt-4 text-sm text-red-600">
+        <p role="alert" className="mb-4 text-sm text-red-300">
           {erroCarregamento}{" "}
-          <button
-            type="button"
-            onClick={recarregarJogadores}
-            className="underline"
-          >
+          <button type="button" onClick={recarregarJogadores} className="underline">
             Tentar novamente
           </button>
         </p>
       )}
 
-      <div className="mt-6">
-        <label htmlFor="data-pelada" className="block text-sm font-medium">
+      <div className="mb-6">
+        <label htmlFor="data-pelada" className="block text-sm font-medium text-white/80">
           Data da pelada
         </label>
         <input
@@ -275,23 +258,23 @@ function FutebolContent({ pin, onAuthError }: FutebolContentProps) {
           type="date"
           value={draft.data}
           onChange={(e) => handleChangeData(e.target.value)}
-          className="mt-1 rounded-md border border-border bg-background px-3 py-2 text-sm"
+          className="mt-1 rounded-md border border-white/20 bg-white/10 px-3 py-2 text-sm text-white [color-scheme:dark]"
         />
       </div>
 
-      <div className="mt-6">
+      <div className="mb-6">
         <PlayerRoster
           jogadores={jogadores}
           pin={pin}
-          onChanged={recarregarJogadores}
+          onChanged={handleRosterChanged}
           onAuthError={onAuthError}
         />
       </div>
 
       {carregandoJogadores ? (
-        <p className="mt-6 text-sm text-muted">Carregando jogadores...</p>
+        <p className="mb-6 text-sm text-white/60">Carregando jogadores...</p>
       ) : (
-        <div className="mt-6">
+        <div className="mb-6">
           <AttendanceList
             jogadores={jogadores}
             presentesIds={draft.presentesIds}
@@ -300,17 +283,17 @@ function FutebolContent({ pin, onAuthError }: FutebolContentProps) {
         </div>
       )}
 
-      <section className="mt-6">
-        <h2 className="mb-2 text-sm font-semibold">
+      <section className="mb-6">
+        <h3 className="mb-2 text-sm font-semibold text-white/80">
           Presentes ({jogadoresPresentes.length})
-        </h2>
+        </h3>
         <PresentPlayers
           jogadores={jogadoresPresentes}
           onChangeStat={handleChangeStat}
         />
       </section>
 
-      <section className="mt-6">
+      <section className="mb-6">
         <TeamDraw
           presentesCount={draft.presentesIds.length}
           numTimes={draft.numTimes}
@@ -322,7 +305,7 @@ function FutebolContent({ pin, onAuthError }: FutebolContentProps) {
       </section>
 
       {draft.numTimes === 2 && Object.keys(draft.times).length > 0 && (
-        <section className="mt-6">
+        <section className="mb-6">
           <Scoreboard
             placar={draft.placar ?? [0, 0]}
             onChange={handleChangePlacar}
@@ -330,14 +313,14 @@ function FutebolContent({ pin, onAuthError }: FutebolContentProps) {
         </section>
       )}
 
-      <section className="mt-6 flex flex-col items-center gap-3 rounded-lg border border-border bg-card p-4">
+      <section className="flex flex-col items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
         {erroEnvio && (
-          <p role="alert" className="text-sm text-red-600">
+          <p role="alert" className="text-sm text-red-300">
             {erroEnvio}
           </p>
         )}
         {sucessoEnvio && (
-          <p role="status" className="text-sm text-emerald-600">
+          <p role="status" className="text-sm text-emerald-300">
             Pelada registrada com sucesso!{" "}
             <button
               type="button"
@@ -356,30 +339,75 @@ function FutebolContent({ pin, onAuthError }: FutebolContentProps) {
             draft.presentesIds.length === 0 ||
             Object.keys(draft.times).length === 0
           }
-          className="w-full max-w-xs rounded-md bg-accent px-6 py-3 text-base font-semibold text-accent-foreground transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+          className="w-full max-w-xs rounded-md bg-[#2F4FE0] px-6 py-3 text-base font-semibold text-white transition-colors hover:bg-[#2643C8] disabled:cursor-not-allowed disabled:opacity-40"
         >
           {enviandoResultado ? "Enviando..." : "Finalizar pelada"}
         </button>
-      </section>
-
-      <section className="mt-8">
-        <h2 className="mb-2 text-lg font-semibold">Tabela individual</h2>
-        <RankingTable jogadores={ranking} />
       </section>
     </div>
   );
 }
 
 export function FutebolApp() {
+  const [rankingKey, setRankingKey] = useState(0);
+
+  useEffect(() => {
+    document.documentElement.lang = "pt";
+  }, []);
+
+  const recarregarRanking = useCallback(() => {
+    setRankingKey((k) => k + 1);
+  }, []);
+
   return (
-    <ThemeProvider>
-      <div className="min-h-screen bg-background text-foreground">
-        <PinGate>
-          {(pin, onAuthError) => (
-            <FutebolContent pin={pin} onAuthError={onAuthError} />
-          )}
-        </PinGate>
+    <div
+      className="min-h-screen text-white"
+      style={{
+        background:
+          "linear-gradient(135deg, #0A1240 0%, #12225E 45%, #1E3FBE 100%)",
+      }}
+    >
+      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
+        <header className="flex items-start justify-between gap-3">
+          <div>
+            <h1 className="text-5xl font-black uppercase leading-none tracking-tight sm:text-6xl">
+              Futebol
+            </h1>
+            <p className="mt-2 text-lg font-semibold text-white/90">
+              da Igreja Onda BH
+            </p>
+          </div>
+          <Link
+            href="/"
+            className="mt-2 shrink-0 text-xs text-white/60 transition-colors hover:text-white"
+          >
+            ← Voltar ao site
+          </Link>
+        </header>
+
+        <section className="mt-8">
+          <RankingSection refreshKey={rankingKey} />
+        </section>
+
+        <section className="mt-10">
+          <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-white/50">
+            Área da organização
+          </h2>
+          <PinGate>
+            {(pin, onAuthError) => (
+              <FutebolContent
+                pin={pin}
+                onAuthError={onAuthError}
+                onDadosAtualizados={recarregarRanking}
+              />
+            )}
+          </PinGate>
+        </section>
+
+        <footer className="mt-12 flex flex-col items-center gap-1 pb-4 text-center">
+          <Wordmark className="text-base text-white" />
+        </footer>
       </div>
-    </ThemeProvider>
+    </div>
   );
 }
