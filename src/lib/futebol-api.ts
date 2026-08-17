@@ -47,11 +47,12 @@ async function chamar<T>(
     throw new FutebolApiError("Não foi possível conectar ao servidor.", 0);
   }
 
+  const bodyClone = response.clone();
   let body: Record<string, unknown>;
   try {
     body = await response.json();
   } catch {
-    const texto = await response.clone().text().catch(() => "");
+    const texto = await bodyClone.text().catch(() => "");
     console.error(
       `[futebol] resposta não-JSON de ?action=${action} (status ${response.status}):`,
       texto.slice(0, 500)
