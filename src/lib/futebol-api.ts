@@ -51,6 +51,11 @@ async function chamar<T>(
   try {
     body = await response.json();
   } catch {
+    const texto = await response.clone().text().catch(() => "");
+    console.error(
+      `[futebol] resposta não-JSON de ?action=${action} (status ${response.status}):`,
+      texto.slice(0, 500)
+    );
     throw new FutebolApiError(
       "Resposta inválida do servidor.",
       response.status
@@ -58,8 +63,15 @@ async function chamar<T>(
   }
 
   if (!response.ok) {
+    const mensagem =
+      typeof body.error === "string" ? body.error : "Erro inesperado no servidor.";
+    console.error(
+      `[futebol] erro em ?action=${action} (status ${response.status}):`,
+      mensagem,
+      typeof body.detalhe === "string" ? `— ${body.detalhe}` : ""
+    );
     throw new FutebolApiError(
-      typeof body.error === "string" ? body.error : "Erro inesperado no servidor.",
+      typeof body.detalhe === "string" ? `${mensagem} — ${body.detalhe}` : mensagem,
       response.status
     );
   }

@@ -28,6 +28,20 @@ function require_pin(array $body): void
     }
 }
 
+/**
+ * Reduz uma exceção a um formato seguro para expor na resposta: inclui o
+ * código SQLSTATE/driver (útil pra diagnosticar host/credenciais erradas)
+ * mas nunca a string de conexão ou a senha. O erro completo sempre vai
+ * pro error_log do PHP também.
+ */
+function detalhe_seguro_do_erro(Throwable $e): string
+{
+    if ($e instanceof PDOException) {
+        return 'Erro de banco de dados (código ' . $e->getCode() . '): ' . $e->getMessage();
+    }
+    return $e->getMessage();
+}
+
 function clean_nome(mixed $nome): string
 {
     $nome = trim((string)$nome);
@@ -39,6 +53,47 @@ function clean_nome(mixed $nome): string
 
 $action = $_GET['action'] ?? '';
 $method = $_SERVER['REQUEST_METHOD'];
+
+if ($method === 'GET' && $action === 'debug') {
+    $pin = (string)($_GET['pin'] ?? '');
+    $info = [
+        'php_version' => PHP_VERSION,
+        'pdo_drivers' => PDO::getAvailableDrivers(),
+        'config_php_existe' => file_exists(__DIR__ . '/config.php'),
+    ];
+
+    try {
+        futebol_carregar_config();
+        $info['constantes'] = [
+            'DB_HOST' => 'ok (' . DB_HOST . ')',
+            'DB_NAME' => 'ok (' . DB_NAME . ')',
+            'DB_USER' => 'ok (' . DB_USER . ')',
+            'DB_PASS' => 'ok (' . strlen(DB_PASS) . ' caractere(s))',
+            'ADMIN_PIN' => 'ok (' . strlen(ADMIN_PIN) . ' caractere(s))',
+        ];
+    } catch (Throwable $e) {
+        $info['config_erro'] = $e->getMessage();
+        json_out($info, 500);
+    }
+
+    if ($pin === '' || !hash_equals(ADMIN_PIN, $pin)) {
+        json_out(['error' => 'PIN inválido. Use ?action=debug&pin=SEUPIN para ver o diagnóstico completo.'] + $info, 401);
+    }
+
+    try {
+        $pdo = futebol_db();
+        $pdo->query('SELECT 1');
+        $info['conexao'] = 'ok';
+        $info['tabelas'] = $pdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);
+    } catch (Throwable $e) {
+        error_log('[futebol debug] ' . $e->getMessage());
+        $info['conexao'] = 'falhou';
+        $info['erro'] = detalhe_seguro_do_erro($e);
+        json_out($info, 500);
+    }
+
+    json_out($info);
+}
 
 try {
     $pdo = futebol_db();
@@ -172,8 +227,12 @@ try {
 
     json_out(['error' => 'Ação não encontrada'], 404);
 } catch (Throwable $e) {
-    if (isset($pdo) && $pdo->inTransaction()) {
+    if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
         $pdo->rollBack();
     }
-    json_out(['error' => 'Erro no servidor'], 500);
+    error_log('[futebol] ' . $e->getMessage());
+    json_out([
+        'error' => 'Erro no servidor',
+        'detalhe' => detalhe_seguro_do_erro($e),
+    ], 500);
 }
