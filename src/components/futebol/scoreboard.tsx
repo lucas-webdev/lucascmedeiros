@@ -1,6 +1,7 @@
 "use client";
 
 import { useId } from "react";
+import { VestIcon } from "./vest-icon";
 
 interface ScoreboardProps {
   placar: [number, number];
@@ -14,7 +15,8 @@ export function Scoreboard({ placar, onChange }: ScoreboardProps) {
   return (
     <div className="rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
       <h3 className="text-center text-sm font-semibold text-white/80">Placar</h3>
-      <div className="mt-3 flex items-center justify-center gap-4">
+      <div className="mt-3 flex items-center justify-center gap-3">
+        <VestIcon className="h-8 w-8 shrink-0 text-blue-400" />
         <div className="text-center">
           <label htmlFor={id1} className="block text-xs text-white/60">
             Time Azul
@@ -48,6 +50,7 @@ export function Scoreboard({ placar, onChange }: ScoreboardProps) {
             className="mt-1 w-16 rounded-md border border-white/20 bg-white/10 px-2 py-2 text-center text-2xl font-bold tabular-nums text-white"
           />
         </div>
+        <VestIcon className="h-8 w-8 shrink-0 text-amber-400" />
       </div>
     </div>
   );
