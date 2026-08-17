@@ -35,8 +35,7 @@ export function RankingSection({ refreshKey }: RankingSectionProps) {
         Tabela individual
       </h2>
       <p className="mb-4 text-sm text-white/60">
-        Pontos, jogos, gols e assistências de cada jogador. Aberta para
-        todo mundo — sem precisar de PIN.
+        Pontos, jogos, gols e assistências de cada jogador.
       </p>
 
       {carregando ? (

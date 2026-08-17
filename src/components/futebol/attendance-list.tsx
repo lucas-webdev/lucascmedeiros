@@ -23,7 +23,7 @@ export function AttendanceList({
       {jogadores.length === 0 ? (
         <p className="mt-2 text-sm text-white/60">Nenhum jogador cadastrado.</p>
       ) : (
-        <ul className="mt-3 divide-y divide-white/10">
+        <ul className="mt-3 max-h-[450px] divide-y divide-white/10 overflow-y-auto pr-1 [color-scheme:dark]">
           {jogadores.map((jogador) => {
             const checked = presentesSet.has(jogador.id);
             const inputId = `presenca-${jogador.id}`;

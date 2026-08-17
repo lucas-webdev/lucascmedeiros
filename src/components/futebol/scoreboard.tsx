@@ -17,7 +17,7 @@ export function Scoreboard({ placar, onChange }: ScoreboardProps) {
       <div className="mt-3 flex items-center justify-center gap-4">
         <div className="text-center">
           <label htmlFor={id1} className="block text-xs text-white/60">
-            Time 1
+            Time Azul
           </label>
           <input
             id={id1}
@@ -35,7 +35,7 @@ export function Scoreboard({ placar, onChange }: ScoreboardProps) {
         </span>
         <div className="text-center">
           <label htmlFor={id2} className="block text-xs text-white/60">
-            Time 2
+            Time Amarelo
           </label>
           <input
             id={id2}
