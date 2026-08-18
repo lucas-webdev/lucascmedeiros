@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "Futebol Onda BH",
   description: "Gestão de presença, times e estatísticas da pelada.",
   robots: { index: false, follow: false },
-  manifest: "/futebol-icons/manifest.webmanifest?v=2",
+  manifest: "/futebol-icons/manifest.webmanifest?v=3",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
