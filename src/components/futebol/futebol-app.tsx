@@ -367,7 +367,22 @@ export function FutebolApp() {
           "linear-gradient(135deg, #0A1240 0%, #12225E 45%, #1E3FBE 100%)",
       }}
     >
-      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
+      <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        <svg
+          className="absolute left-0 top-0"
+          style={{ width: "65vmin", height: "65vmin", filter: "blur(2.5px)" }}
+          viewBox="0 0 200 200"
+          preserveAspectRatio="xMidYMid meet"
+        >
+          <circle className="futebol-wave-ring" cx="0" cy="0" r="35" style={{ strokeWidth: 1.5, opacity: 0.18 }} />
+          <circle className="futebol-wave-ring" cx="0" cy="0" r="65" style={{ strokeWidth: 1.5, opacity: 0.14 }} />
+          <circle className="futebol-wave-ring" cx="0" cy="0" r="95" style={{ strokeWidth: 1.5, opacity: 0.1 }} />
+          <circle className="futebol-wave-ring" cx="0" cy="0" r="125" style={{ strokeWidth: 1.5, opacity: 0.07 }} />
+          <circle className="futebol-wave-ring" cx="0" cy="0" r="155" style={{ strokeWidth: 1.5, opacity: 0.05 }} />
+        </svg>
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-3xl px-4 py-10 sm:px-6">
         <header className="flex items-start justify-between gap-3">
           <div>
             <h1 className="text-5xl font-black uppercase leading-none tracking-tight sm:text-6xl">
