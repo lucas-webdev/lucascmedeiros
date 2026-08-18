@@ -7,26 +7,64 @@ function embaralhar<T>(itens: T[]): T[] {
   return resultado;
 }
 
+export interface JogadorParaSorteio {
+  id: number;
+  pontos: number;
+  jogos: number;
+  gols: number;
+  assistencias: number;
+}
+
 /**
- * Distribui jogadores em `numTimes` times o mais equilibrado possível
- * (diferença máxima de 1 jogador entre times, já que não há dado de nível
- * de habilidade para balancear por força).
+ * Nota de cada jogador = pontos por jogo + aproveitamento (gols+assistências
+ * por jogo). Pontos por jogo em vez do total bruto — senão alguém "mediano"
+ * que já jogou muitas peladas acumula mais pontos que alguém bom que jogou
+ * pouco, o que distorceria o equilíbrio. Sem jogos ainda = nota neutra (0).
+ */
+function calcularNotas(jogadores: JogadorParaSorteio[]): Map<number, number> {
+  const notas = new Map<number, number>();
+  for (const j of jogadores) {
+    const nota =
+      j.jogos > 0 ? j.pontos / j.jogos + (j.gols + j.assistencias) / j.jogos : 0;
+    notas.set(j.id, nota);
+  }
+  return notas;
+}
+
+/**
+ * Sorteia os times equilibrando pela nota de cada jogador presente (pontos +
+ * aproveitamento). Em vez de um "zigue-zague" fixo por posição no ranking
+ * (que sempre repetiria a mesma divisão entre as mesmas pessoas, semana após
+ * semana), agrupa jogadores de nível parecido em blocos do tamanho do número
+ * de times — 1º e 2º colocados do dia formam um bloco, 3º e 4º outro, e
+ * assim por diante — e dentro de cada bloco sorteia aleatoriamente quem vai
+ * para qual time. Isso garante que os melhores de cada bloco nunca fiquem
+ * juntos (mantém o equilíbrio), mas a distribuição em si varia a cada
+ * sorteio, mesmo com o mesmo grupo de presentes.
  */
 export function sortearTimes(
-  jogadorIds: number[],
+  jogadores: JogadorParaSorteio[],
   numTimes: number
 ): Record<number, number[]> {
-  const embaralhados = embaralhar(jogadorIds);
-  const times: Record<number, number[]> = {};
+  const notas = calcularNotas(jogadores);
+  const ordenados = [...jogadores].sort(
+    (a, b) => (notas.get(b.id) ?? 0) - (notas.get(a.id) ?? 0)
+  );
 
+  const times: Record<number, number[]> = {};
   for (let time = 1; time <= numTimes; time++) {
     times[time] = [];
   }
 
-  embaralhados.forEach((id, index) => {
-    const time = (index % numTimes) + 1;
-    times[time].push(id);
-  });
+  for (let inicio = 0; inicio < ordenados.length; inicio += numTimes) {
+    const bloco = ordenados.slice(inicio, inicio + numTimes);
+    const timesDoBloco = embaralhar(
+      Array.from({ length: numTimes }, (_, i) => i + 1)
+    );
+    bloco.forEach((jogador, i) => {
+      times[timesDoBloco[i]].push(jogador.id);
+    });
+  }
 
   return times;
 }

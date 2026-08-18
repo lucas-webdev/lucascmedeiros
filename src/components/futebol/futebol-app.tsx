@@ -154,7 +154,10 @@ function FutebolContent({
   const handleSortear = () => {
     setDraft((prev) => {
       if (!prev) return prev;
-      const times = sortearTimes(prev.presentesIds, prev.numTimes);
+      const presentes = prev.presentesIds
+        .map((id) => jogadores.find((j) => j.id === id))
+        .filter((j): j is Jogador => Boolean(j));
+      const times = sortearTimes(presentes, prev.numTimes);
       return {
         ...prev,
         times,
