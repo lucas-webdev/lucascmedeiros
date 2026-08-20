@@ -107,14 +107,21 @@ try {
     }
 
     if ($method === 'GET' && $action === 'ranking') {
-        // Desempate por aproveitamento (gols+assistências / jogos) — mantido
-        // em sincronia com o critério usado em ranking-table.tsx no front-end,
-        // que é quem de fato decide a ordem exibida.
+        // Desempate pelo "overall" (mesma fórmula de calcularOverall em
+        // ranking-table.tsx, que é quem de fato decide a ordem exibida):
+        // taxa de vitória (peso 0.7) + participação em gols/assistências
+        // (peso 0.3), escalado por um fator de maturidade que cresce com
+        // o número de jogos mas nunca alcança 1.
         $stmt = $pdo->query(
             'SELECT id, nome, mensalista, pontos, jogos, gols, assistencias
              FROM jogadores WHERE ativo = 1
              ORDER BY pontos DESC,
-                      (CASE WHEN jogos > 0 THEN (gols + assistencias) / jogos ELSE 0 END) DESC,
+                      (CASE WHEN jogos > 0 THEN
+                        (jogos / (jogos + 4)) * (
+                          0.7 * LEAST(1, (pontos / jogos) / 3) +
+                          0.3 * LEAST(1, (gols + assistencias) / jogos)
+                        )
+                      ELSE 0 END) DESC,
                       nome ASC'
         );
         json_out(['jogadores' => $stmt->fetchAll()]);

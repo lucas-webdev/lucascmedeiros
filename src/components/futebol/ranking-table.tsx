@@ -14,15 +14,32 @@ const DESTAQUE_LINHA = [
 ];
 const DESTAQUE_PONTOS = ["text-amber-300", "text-slate-200", "text-orange-400"];
 
-function aproveitamento(jogador: Jogador): number {
-  return jogador.jogos > 0
-    ? (jogador.gols + jogador.assistencias) / jogador.jogos
-    : 0;
+/**
+ * "Overall" do jogador (0 a ~100): combina taxa de vitória (pontos por
+ * jogo, peso maior) com participação em gols/assistências (peso menor).
+ * Um fator de "maturidade" — que cresce com o número de jogos mas nunca
+ * chega a 1 — limita o quanto desse desempenho já pode aparecer: com só
+ * 1 jogo, o resultado fica sempre entre 50 e 60, não importa o quão bem
+ * (ou mal) o jogador se saiu; conforme mais jogos acontecem, a faixa
+ * acessível se abre, mas chegar perto de 100 exige muitos jogos E
+ * desempenho consistente — não é algo que uma pelada isolada garante.
+ */
+function calcularOverall(jogador: Jogador): number {
+  if (jogador.jogos <= 0) return 0;
+
+  const pontosPorJogo = jogador.pontos / jogador.jogos;
+  const participacaoPorJogo =
+    (jogador.gols + jogador.assistencias) / jogador.jogos;
+  const desempenho =
+    0.7 * Math.min(1, pontosPorJogo / 3) + 0.3 * Math.min(1, participacaoPorJogo);
+  const maturidade = jogador.jogos / (jogador.jogos + 4);
+
+  return 50 + 50 * maturidade * desempenho;
 }
 
 export function RankingTable({ jogadores }: RankingTableProps) {
   const ordenados = [...jogadores].sort(
-    (a, b) => b.pontos - a.pontos || aproveitamento(b) - aproveitamento(a)
+    (a, b) => b.pontos - a.pontos || calcularOverall(b) - calcularOverall(a)
   );
 
   if (ordenados.length === 0) {
@@ -57,7 +74,7 @@ export function RankingTable({ jogadores }: RankingTableProps) {
               Assist.
             </th>
             <th scope="col" className="px-4 py-3 text-right">
-              %
+              Overall
             </th>
           </tr>
         </thead>
@@ -103,7 +120,7 @@ export function RankingTable({ jogadores }: RankingTableProps) {
                   {jogador.assistencias}
                 </td>
                 <td className="px-4 py-3 text-right text-white/70">
-                  {Math.round(aproveitamento(jogador) * 100)}%
+                  {Math.round(calcularOverall(jogador))}%
                 </td>
               </tr>
             );
