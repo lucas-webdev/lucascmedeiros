@@ -79,9 +79,23 @@ export function TeamDraw({
                   {visual.nome}
                 </h3>
                 <ul className="mt-2 space-y-1 text-sm text-white">
-                  {ids.map((id) => (
-                    <li key={id}>{jogadoresPorId.get(id)?.nome ?? id}</li>
-                  ))}
+                  {ids.map((id) => {
+                    const jogador = jogadoresPorId.get(id);
+                    return (
+                      <li key={id} className="flex items-center gap-1.5">
+                        {jogador?.nome ?? id}
+                        {jogador?.mensalista && (
+                          <span
+                            aria-label="Mensalista"
+                            title="Mensalista"
+                            className="text-amber-400"
+                          >
+                            ★
+                          </span>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             );
