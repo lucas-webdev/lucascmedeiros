@@ -30,8 +30,17 @@ function calcularOverall(jogador: Jogador): number {
   const pontosPorJogo = jogador.pontos / jogador.jogos;
   const participacaoPorJogo =
     (jogador.gols + jogador.assistencias) / jogador.jogos;
-  const desempenho =
-    0.7 * Math.min(1, pontosPorJogo / 3) + 0.3 * Math.min(1, participacaoPorJogo);
+
+  const termoVitoria = Math.min(1, pontosPorJogo / 3);
+  // Satura suavemente em vez de travar num teto: com min(1, participação),
+  // qualquer jogador com 1+ participação por jogo empatava em 1, igualando
+  // quem fez 1 gol com quem fez 6. Essa curva nunca empata dois totais
+  // diferentes — cada gol/assistência a mais sempre soma algo, só que com
+  // retorno decrescente.
+  const termoParticipacao =
+    participacaoPorJogo / (participacaoPorJogo + 0.5);
+
+  const desempenho = 0.7 * termoVitoria + 0.3 * termoParticipacao;
   const maturidade = jogador.jogos / (jogador.jogos + 4);
 
   return 50 + 50 * maturidade * desempenho;
@@ -120,7 +129,7 @@ export function RankingTable({ jogadores }: RankingTableProps) {
                   {jogador.assistencias}
                 </td>
                 <td className="px-4 py-3 text-right text-white/70">
-                  {Math.round(calcularOverall(jogador))}%
+                  {calcularOverall(jogador).toFixed(1)}%
                 </td>
               </tr>
             );

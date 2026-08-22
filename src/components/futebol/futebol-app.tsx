@@ -22,6 +22,11 @@ import { PresentPlayers } from "./present-players";
 import { TeamDraw } from "./team-draw";
 import { Scoreboard } from "./scoreboard";
 import { RankingSection } from "./ranking-section";
+import {
+  ResumoPeladaModal,
+  calcularResumoPelada,
+  type ResumoPeladaData,
+} from "./resumo-pelada-modal";
 
 function Wordmark({ className = "" }: { className?: string }) {
   return (
@@ -51,7 +56,7 @@ function FutebolContent({
 
   const [enviandoResultado, setEnviandoResultado] = useState(false);
   const [erroEnvio, setErroEnvio] = useState<string | null>(null);
-  const [sucessoEnvio, setSucessoEnvio] = useState(false);
+  const [resumo, setResumo] = useState<ResumoPeladaData | null>(null);
 
   useEffect(() => {
     const data = hojeISO();
@@ -106,6 +111,26 @@ function FutebolContent({
     [jogadoresPresentes]
   );
 
+  // Base do placar = soma dos gols marcados na lista de presentes, por
+  // time. O placar exibido soma essa base a um ajuste manual (gol contra,
+  // por exemplo) — assim, editar o placar não se perde quando um gol
+  // normal é marcado depois: ele soma em cima do valor do momento.
+  const placarBase: [number, number] = useMemo(() => {
+    let time1 = 0;
+    let time2 = 0;
+    for (const jogador of jogadoresPresentes) {
+      if (jogador.timeNumero === 1) time1 += jogador.gols;
+      else if (jogador.timeNumero === 2) time2 += jogador.gols;
+    }
+    return [time1, time2];
+  }, [jogadoresPresentes]);
+
+  const placarAjuste: [number, number] = draft?.placarAjuste ?? [0, 0];
+  const placarExibido: [number, number] = [
+    placarBase[0] + placarAjuste[0],
+    placarBase[1] + placarAjuste[1],
+  ];
+
   if (!pronto || !draft) {
     return (
       <div className="flex min-h-[30vh] items-center justify-center text-sm text-white/60">
@@ -117,7 +142,6 @@ function FutebolContent({
   const handleChangeData = (novaData: string) => {
     if (!novaData) return;
     setDraft(carregarDraft(novaData) ?? criarDraftVazio(novaData));
-    setSucessoEnvio(false);
     setErroEnvio(null);
   };
 
@@ -144,9 +168,7 @@ function FutebolContent({
 
   const handleChangeNumTimes = (n: number) => {
     setDraft((prev) =>
-      prev
-        ? { ...prev, numTimes: n, times: {}, placar: n === 2 ? prev.placar : null }
-        : prev
+      prev ? { ...prev, numTimes: n, times: {}, placarAjuste: [0, 0] } : prev
     );
   };
 
@@ -157,11 +179,7 @@ function FutebolContent({
         .map((id) => jogadores.find((j) => j.id === id))
         .filter((j): j is Jogador => Boolean(j));
       const times = sortearTimes(presentes, prev.numTimes);
-      return {
-        ...prev,
-        times,
-        placar: prev.numTimes === 2 ? prev.placar ?? [0, 0] : null,
-      };
+      return { ...prev, times, placarAjuste: [0, 0] };
     });
   };
 
@@ -183,8 +201,18 @@ function FutebolContent({
     });
   };
 
-  const handleChangePlacar = (placar: [number, number]) => {
-    setDraft((prev) => (prev ? { ...prev, placar } : prev));
+  const handleChangePlacar = (novoPlacar: [number, number]) => {
+    setDraft((prev) => {
+      if (!prev) return prev;
+      // Guarda a diferença entre o valor digitado e a soma atual dos gols
+      // como ajuste — assim, quando um gol normal for marcado depois, ele
+      // soma em cima do valor editado, em vez de ser sobrescrito por ele.
+      const ajuste: [number, number] = [
+        novoPlacar[0] - placarBase[0],
+        novoPlacar[1] - placarBase[1],
+      ];
+      return { ...prev, placarAjuste: ajuste };
+    });
   };
 
   const handleFinalizarPelada = async () => {
@@ -215,13 +243,15 @@ function FutebolContent({
       }
 
       const placarFinal: [number, number] | null =
-        draft.numTimes === 2 ? draft.placar ?? [0, 0] : null;
+        draft.numTimes === 2 ? placarExibido : null;
 
       await submitMatch(pin, draft.data, draft.numTimes, placarFinal, payload);
 
+      setResumo(
+        calcularResumoPelada(jogadoresPresentes, draft.numTimes, placarFinal)
+      );
       limparDraft(draft.data);
       setDraft(criarDraftVazio(draft.data));
-      setSucessoEnvio(true);
       await recarregarJogadores();
       onDadosAtualizados();
     } catch (e) {
@@ -308,10 +338,7 @@ function FutebolContent({
 
       {draft.numTimes === 2 && Object.keys(draft.times).length > 0 && (
         <section className="mb-6">
-          <Scoreboard
-            placar={draft.placar ?? [0, 0]}
-            onChange={handleChangePlacar}
-          />
+          <Scoreboard placar={placarExibido} onChange={handleChangePlacar} />
         </section>
       )}
 
@@ -319,18 +346,6 @@ function FutebolContent({
         {erroEnvio && (
           <p role="alert" className="text-sm text-red-300">
             {erroEnvio}
-          </p>
-        )}
-        {sucessoEnvio && (
-          <p role="status" className="text-sm text-emerald-300">
-            Pelada registrada com sucesso!{" "}
-            <button
-              type="button"
-              onClick={() => setSucessoEnvio(false)}
-              className="underline"
-            >
-              Ok
-            </button>
           </p>
         )}
         <button
@@ -346,6 +361,10 @@ function FutebolContent({
           {enviandoResultado ? "Enviando..." : "Finalizar pelada"}
         </button>
       </section>
+
+      {resumo && (
+        <ResumoPeladaModal resumo={resumo} onClose={() => setResumo(null)} />
+      )}
     </div>
   );
 }

@@ -119,7 +119,7 @@ try {
                       (CASE WHEN jogos > 0 THEN
                         (jogos / (jogos + 4)) * (
                           0.7 * LEAST(1, (pontos / jogos) / 3) +
-                          0.3 * LEAST(1, (gols + assistencias) / jogos)
+                          0.3 * (((gols + assistencias) / jogos) / (((gols + assistencias) / jogos) + 0.5))
                         )
                       ELSE 0 END) DESC,
                       nome ASC'

@@ -26,6 +26,7 @@ export function Scoreboard({ placar, onChange }: ScoreboardProps) {
             type="number"
             min={0}
             value={placar[0]}
+            onFocus={(e) => e.target.select()}
             onChange={(e) =>
               onChange([Math.max(0, Number(e.target.value) || 0), placar[1]])
             }
@@ -44,6 +45,7 @@ export function Scoreboard({ placar, onChange }: ScoreboardProps) {
             type="number"
             min={0}
             value={placar[1]}
+            onFocus={(e) => e.target.select()}
             onChange={(e) =>
               onChange([placar[0], Math.max(0, Number(e.target.value) || 0)])
             }
