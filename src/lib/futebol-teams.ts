@@ -66,6 +66,15 @@ export function sortearTimes(
     });
   }
 
+  // A ordem de exibição dentro de cada time também é embaralhada — sem
+  // isso, a posição de cada jogador na lista vazaria a ordem de nível
+  // usada pro equilíbrio (melhor sempre aparecendo primeiro). Isso
+  // importa porque essa ordem é usada pra definir a escalação inicial
+  // (os primeiros da lista de cada time entram primeiro em quadra).
+  for (const time of Object.keys(times)) {
+    times[Number(time)] = embaralhar(times[Number(time)]);
+  }
+
   return times;
 }
 

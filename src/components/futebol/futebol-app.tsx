@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import {
   FutebolApiError,
   getPlayers,
@@ -386,21 +385,13 @@ export function FutebolApp() {
       </div>
 
       <div className="relative z-10 mx-auto max-w-3xl px-4 py-10 sm:px-6">
-        <header className="flex items-start justify-between gap-3">
-          <div>
-            <h1 className="text-5xl font-black uppercase leading-none tracking-tight sm:text-6xl">
-              Futebol
-            </h1>
-            <p className="mt-2 text-lg font-semibold text-white/90">
-              da Igreja Onda BH
-            </p>
-          </div>
-          <Link
-            href="/"
-            className="mt-2 shrink-0 text-xs text-white/60 transition-colors hover:text-white"
-          >
-            ← Voltar ao site
-          </Link>
+        <header>
+          <h1 className="text-5xl font-black uppercase leading-none tracking-tight sm:text-6xl">
+            Futebol
+          </h1>
+          <p className="mt-2 text-lg font-semibold text-white/90">
+            da Igreja Onda BH
+          </p>
         </header>
 
         <section className="mt-8">

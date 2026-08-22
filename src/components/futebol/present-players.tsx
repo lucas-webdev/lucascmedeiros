@@ -15,6 +15,14 @@ interface PresentPlayersProps {
   ) => void;
 }
 
+/** Time Amarelo (2) primeiro, Time Azul (1) depois, demais times (3+) na sequência. */
+function ordemTime(timeNumero: number | null): number {
+  if (timeNumero === null) return -1;
+  if (timeNumero === 2) return 0;
+  if (timeNumero === 1) return 1;
+  return timeNumero + 1;
+}
+
 export function PresentPlayers({ jogadores, onChangeStat }: PresentPlayersProps) {
   if (jogadores.length === 0) {
     return (
@@ -23,6 +31,12 @@ export function PresentPlayers({ jogadores, onChangeStat }: PresentPlayersProps)
       </p>
     );
   }
+
+  const ordenados = [...jogadores].sort((a, b) => {
+    const diffTime = ordemTime(a.timeNumero) - ordemTime(b.timeNumero);
+    if (diffTime !== 0) return diffTime;
+    return a.nome.localeCompare(b.nome, "pt-BR");
+  });
 
   return (
     <div className="overflow-x-auto rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm">
@@ -44,7 +58,7 @@ export function PresentPlayers({ jogadores, onChangeStat }: PresentPlayersProps)
           </tr>
         </thead>
         <tbody className="divide-y divide-white/10">
-          {jogadores.map((jogador) => (
+          {ordenados.map((jogador) => (
             <tr key={jogador.id}>
               <td className="px-4 py-3">
                 <span className="flex items-center gap-1.5 text-white">

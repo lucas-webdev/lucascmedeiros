@@ -14,6 +14,9 @@ export function AttendanceList({
   onToggle,
 }: AttendanceListProps) {
   const presentesSet = new Set(presentesIds);
+  const ordenados = [...jogadores].sort((a, b) =>
+    a.nome.localeCompare(b.nome, "pt-BR")
+  );
 
   return (
     <fieldset className="rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
@@ -24,7 +27,7 @@ export function AttendanceList({
         <p className="mt-2 text-sm text-white/60">Nenhum jogador cadastrado.</p>
       ) : (
         <ul className="mt-3 max-h-[450px] divide-y divide-white/10 overflow-y-auto pr-1 [color-scheme:dark]">
-          {jogadores.map((jogador) => {
+          {ordenados.map((jogador) => {
             const checked = presentesSet.has(jogador.id);
             const inputId = `presenca-${jogador.id}`;
             return (
