@@ -13,6 +13,7 @@ export interface JogadorParaSorteio {
   jogos: number;
   gols: number;
   assistencias: number;
+  goleiro?: boolean;
 }
 
 /**
@@ -41,20 +42,37 @@ function calcularNotas(jogadores: JogadorParaSorteio[]): Map<number, number> {
  * para qual time. Isso garante que os melhores de cada bloco nunca fiquem
  * juntos (mantém o equilíbrio), mas a distribuição em si varia a cada
  * sorteio, mesmo com o mesmo grupo de presentes.
+ *
+ * Goleiros marcados pra pelada do dia são distribuídos primeiro, um por
+ * time (embaralhados) — assim nunca ficam dois no mesmo time enquanto
+ * houver time vago; sobrando mais goleiros que times, o excedente reinicia
+ * o ciclo (o mais equilibrado possível). Só depois os jogadores de linha
+ * entram pelo critério de nota de sempre.
  */
 export function sortearTimes(
   jogadores: JogadorParaSorteio[],
   numTimes: number
 ): Record<number, number[]> {
-  const notas = calcularNotas(jogadores);
-  const ordenados = [...jogadores].sort(
-    (a, b) => (notas.get(b.id) ?? 0) - (notas.get(a.id) ?? 0)
-  );
-
   const times: Record<number, number[]> = {};
   for (let time = 1; time <= numTimes; time++) {
     times[time] = [];
   }
+
+  const goleiros = jogadores.filter((j) => j.goleiro);
+  const linha = jogadores.filter((j) => !j.goleiro);
+
+  const goleirosEmbaralhados = embaralhar(goleiros);
+  const ordemTimesGoleiros = embaralhar(
+    Array.from({ length: numTimes }, (_, i) => i + 1)
+  );
+  goleirosEmbaralhados.forEach((jogador, i) => {
+    times[ordemTimesGoleiros[i % numTimes]].push(jogador.id);
+  });
+
+  const notas = calcularNotas(linha);
+  const ordenados = [...linha].sort(
+    (a, b) => (notas.get(b.id) ?? 0) - (notas.get(a.id) ?? 0)
+  );
 
   for (let inicio = 0; inicio < ordenados.length; inicio += numTimes) {
     const bloco = ordenados.slice(inicio, inicio + numTimes);

@@ -137,7 +137,7 @@ export function ResumoPeladaModal({ resumo, onClose }: ResumoPeladaModalProps) {
             id="resumo-pelada-titulo"
             className="text-2xl font-black uppercase leading-none tracking-tight"
           >
-            Pelada finalizada!
+            Partida finalizada!
           </h2>
           <button
             type="button"
@@ -210,7 +210,7 @@ export function ResumoPeladaModal({ resumo, onClose }: ResumoPeladaModalProps) {
 
         <div className="mt-3 rounded-xl border border-white/10 bg-white/5 p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-white/50">
-            Destaques da pelada
+            Destaques do dia
           </p>
           {resumo.destaques.length > 0 ? (
             <ul className="mt-2 space-y-2">

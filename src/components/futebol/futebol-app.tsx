@@ -103,6 +103,7 @@ function FutebolContent({
         timeNumero: timeDoJogador.get(j.id) ?? null,
         gols: draft.estatisticas[j.id]?.gols ?? 0,
         assistencias: draft.estatisticas[j.id]?.assistencias ?? 0,
+        goleiro: (draft.goleiros ?? []).includes(j.id),
       }));
   }, [draft, jogadores]);
 
@@ -175,11 +176,55 @@ function FutebolContent({
   const handleSortear = () => {
     setDraft((prev) => {
       if (!prev) return prev;
+      const goleiros = prev.goleiros ?? [];
       const presentes = prev.presentesIds
         .map((id) => jogadores.find((j) => j.id === id))
-        .filter((j): j is Jogador => Boolean(j));
+        .filter((j): j is Jogador => Boolean(j))
+        .map((j) => ({ ...j, goleiro: goleiros.includes(j.id) }));
       const times = sortearTimes(presentes, prev.numTimes);
       return { ...prev, times, placarAjuste: [0, 0] };
+    });
+  };
+
+  const handleToggleGoleiro = (id: number) => {
+    setDraft((prev) => {
+      if (!prev) return prev;
+      const goleiros = prev.goleiros ?? [];
+      const jaEGoleiro = goleiros.includes(id);
+      return {
+        ...prev,
+        goleiros: jaEGoleiro
+          ? goleiros.filter((gid) => gid !== id)
+          : [...goleiros, id],
+      };
+    });
+  };
+
+  const handleMoverJogador = (
+    id: number,
+    direcao: "anterior" | "proximo"
+  ) => {
+    setDraft((prev) => {
+      if (!prev) return prev;
+      const chaves = Object.keys(prev.times)
+        .map(Number)
+        .sort((a, b) => a - b);
+      const timeAtual = chaves.find((t) => prev.times[t].includes(id));
+      if (timeAtual === undefined) return prev;
+
+      const indiceAtual = chaves.indexOf(timeAtual);
+      const novoIndice =
+        direcao === "anterior" ? indiceAtual - 1 : indiceAtual + 1;
+      if (novoIndice < 0 || novoIndice >= chaves.length) return prev;
+      const novoTime = chaves[novoIndice];
+
+      const novosTimes = { ...prev.times };
+      novosTimes[timeAtual] = novosTimes[timeAtual].filter(
+        (pid) => pid !== id
+      );
+      novosTimes[novoTime] = [...novosTimes[novoTime], id];
+
+      return { ...prev, times: novosTimes, placarAjuste: [0, 0] };
     });
   };
 
@@ -322,6 +367,7 @@ function FutebolContent({
         <PresentPlayers
           jogadores={jogadoresPresentes}
           onChangeStat={handleChangeStat}
+          onToggleGoleiro={handleToggleGoleiro}
         />
       </section>
 
@@ -331,6 +377,7 @@ function FutebolContent({
           numTimes={draft.numTimes}
           onChangeNumTimes={handleChangeNumTimes}
           onSortear={handleSortear}
+          onMoverJogador={handleMoverJogador}
           times={draft.times}
           jogadoresPorId={jogadoresPorId}
         />

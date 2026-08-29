@@ -22,6 +22,7 @@ export function criarDraftVazio(data: string): PeladaDraft {
     times: {},
     estatisticas: {},
     placarAjuste: [0, 0],
+    goleiros: [],
   };
 }
 

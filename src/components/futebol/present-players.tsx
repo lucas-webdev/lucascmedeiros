@@ -13,6 +13,7 @@ interface PresentPlayersProps {
     campo: "gols" | "assistencias",
     valor: number
   ) => void;
+  onToggleGoleiro: (id: number) => void;
 }
 
 /** Time Amarelo (2) primeiro, Time Azul (1) depois, demais times (3+) na sequência. */
@@ -23,7 +24,11 @@ function ordemTime(timeNumero: number | null): number {
   return timeNumero + 1;
 }
 
-export function PresentPlayers({ jogadores, onChangeStat }: PresentPlayersProps) {
+export function PresentPlayers({
+  jogadores,
+  onChangeStat,
+  onToggleGoleiro,
+}: PresentPlayersProps) {
   if (jogadores.length === 0) {
     return (
       <p className="rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-white/60 backdrop-blur-sm">
@@ -45,6 +50,9 @@ export function PresentPlayers({ jogadores, onChangeStat }: PresentPlayersProps)
           <tr className="border-b border-white/10 text-left text-xs uppercase tracking-wide text-white/50">
             <th scope="col" className="px-4 py-3">
               Jogador
+            </th>
+            <th scope="col" className="px-4 py-3">
+              Goleiro
             </th>
             <th scope="col" className="px-4 py-3">
               Time
@@ -73,6 +81,15 @@ export function PresentPlayers({ jogadores, onChangeStat }: PresentPlayersProps)
                     </span>
                   )}
                 </span>
+              </td>
+              <td className="px-4 py-3">
+                <input
+                  type="checkbox"
+                  checked={jogador.goleiro}
+                  onChange={() => onToggleGoleiro(jogador.id)}
+                  aria-label={`${jogador.nome} joga de goleiro nessa pelada`}
+                  className="h-5 w-5 rounded border-white/30 bg-white/10 accent-[#2F4FE0]"
+                />
               </td>
               <td className="px-4 py-3">
                 {jogador.timeNumero ? (

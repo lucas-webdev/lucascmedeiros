@@ -15,6 +15,7 @@ export interface JogadorPresente {
   timeNumero: number | null;
   gols: number;
   assistencias: number;
+  goleiro: boolean;
 }
 
 export interface PeladaDraft {
@@ -30,4 +31,6 @@ export interface PeladaDraft {
    * gols dos jogadores.
    */
   placarAjuste: [number, number];
+  /** Jogadores escalados como goleiro só nessa pelada (não é um dado da tabela geral). */
+  goleiros: number[];
 }
