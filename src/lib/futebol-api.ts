@@ -1,4 +1,4 @@
-import type { Jogador } from "./futebol-types";
+import type { Jogador, PeladaDraft } from "./futebol-types";
 
 const API_URL = "/api/futebol.php";
 
@@ -35,11 +35,13 @@ function mapearJogador(bruto: JogadorBruto): Jogador {
 
 async function chamar<T>(
   action: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  query: Record<string, string> = {}
 ): Promise<T> {
+  const params = new URLSearchParams({ action, ...query });
   let response: Response;
   try {
-    response = await fetch(`${API_URL}?action=${action}`, {
+    response = await fetch(`${API_URL}?${params.toString()}`, {
       headers: { "Content-Type": "application/json" },
       ...options,
     });
@@ -141,4 +143,35 @@ export async function submitMatch(
     }
   );
   return partidaId;
+}
+
+/**
+ * Rascunho da pelada salvo no servidor (times, gols/assistências e placar
+ * em andamento), para permitir continuar a marcação em outro aparelho caso
+ * o atual fique indisponível no meio do jogo. Leitura não exige PIN (mesmo
+ * padrão de `players`/`ranking`) — só é útil dentro da área já protegida
+ * pelo PinGate, e não expõe nada além do que já está nas outras leituras
+ * públicas.
+ */
+export async function getRascunho(data: string): Promise<PeladaDraft | null> {
+  const { rascunho } = await chamar<{ rascunho: PeladaDraft | null }>(
+    "get_rascunho",
+    {},
+    { data }
+  );
+  return rascunho ?? null;
+}
+
+export async function saveRascunho(pin: string, draft: PeladaDraft): Promise<void> {
+  await chamar<{ ok: boolean }>("save_rascunho", {
+    method: "POST",
+    body: JSON.stringify({ pin, data: draft.data, payload: draft }),
+  });
+}
+
+export async function clearRascunho(pin: string, data: string): Promise<void> {
+  await chamar<{ ok: boolean }>("clear_rascunho", {
+    method: "POST",
+    body: JSON.stringify({ pin, data }),
+  });
 }

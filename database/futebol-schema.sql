@@ -34,6 +34,16 @@ CREATE TABLE partida_jogadores (
   UNIQUE KEY uniq_partida_jogador (partida_id, jogador_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Rascunho da pelada do dia (presença, times sorteados, gols/assistências em
+-- andamento, ajuste de placar) — salvo a cada alteração para permitir
+-- continuar a marcação em outro aparelho caso o atual fique indisponível.
+-- Some da tabela quando a pelada é finalizada (submit_match limpa a linha).
+CREATE TABLE pelada_rascunhos (
+  data DATE PRIMARY KEY,
+  payload LONGTEXT NOT NULL,
+  atualizado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- Elenco inicial
 
 -- Mensalistas

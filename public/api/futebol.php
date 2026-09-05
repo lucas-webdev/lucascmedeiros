@@ -156,6 +156,57 @@ try {
         json_out(['ok' => true]);
     }
 
+    if ($method === 'GET' && $action === 'get_rascunho') {
+        $data = (string)($_GET['data'] ?? '');
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $data)) {
+            json_out(['error' => 'data inválida'], 400);
+        }
+
+        $stmt = $pdo->prepare('SELECT payload FROM pelada_rascunhos WHERE data = ?');
+        $stmt->execute([$data]);
+        $row = $stmt->fetch();
+
+        json_out(['rascunho' => $row ? json_decode($row['payload'], true) : null]);
+    }
+
+    if ($method === 'POST' && $action === 'save_rascunho') {
+        $body = read_json_body();
+        require_pin($body);
+
+        $data = (string)($body['data'] ?? '');
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $data)) {
+            json_out(['error' => 'data inválida'], 400);
+        }
+
+        $payload = $body['payload'] ?? null;
+        if (!is_array($payload)) {
+            json_out(['error' => 'payload inválido'], 400);
+        }
+
+        $stmt = $pdo->prepare(
+            'INSERT INTO pelada_rascunhos (data, payload) VALUES (?, ?)
+             ON DUPLICATE KEY UPDATE payload = VALUES(payload)'
+        );
+        $stmt->execute([$data, json_encode($payload, JSON_UNESCAPED_UNICODE)]);
+
+        json_out(['ok' => true]);
+    }
+
+    if ($method === 'POST' && $action === 'clear_rascunho') {
+        $body = read_json_body();
+        require_pin($body);
+
+        $data = (string)($body['data'] ?? '');
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $data)) {
+            json_out(['error' => 'data inválida'], 400);
+        }
+
+        $stmt = $pdo->prepare('DELETE FROM pelada_rascunhos WHERE data = ?');
+        $stmt->execute([$data]);
+
+        json_out(['ok' => true]);
+    }
+
     if ($method === 'POST' && $action === 'submit_match') {
         $body = read_json_body();
         require_pin($body);
@@ -231,6 +282,8 @@ try {
 
             $updateStats->execute([$pontosDelta, $gols, $assistencias, $jogadorId]);
         }
+
+        $pdo->prepare('DELETE FROM pelada_rascunhos WHERE data = ?')->execute([$data]);
 
         $pdo->commit();
 

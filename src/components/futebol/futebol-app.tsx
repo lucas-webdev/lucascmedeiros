@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   FutebolApiError,
   getPlayers,
+  getRascunho,
+  saveRascunho,
   submitMatch,
 } from "@/lib/futebol-api";
 import {
@@ -62,6 +64,17 @@ function FutebolContent({
     const data = hojeISO();
     setDraft(carregarDraft(data) ?? criarDraftVazio(data));
     setPronto(true);
+    // Assim que carregar, busca o rascunho do servidor — se alguém marcou
+    // gols/times em outro aparelho (ex.: o celular que estava editando
+    // ficou sem bateria), continua de onde parou em vez do que sobrou
+    // no localStorage deste navegador.
+    getRascunho(data)
+      .then((remoto) => {
+        if (remoto) setDraft(remoto);
+      })
+      .catch(() => {
+        // sem conexão: segue com o rascunho local mesmo
+      });
   }, []);
 
   useEffect(() => {
@@ -69,6 +82,21 @@ function FutebolContent({
       salvarDraft(draft);
     }
   }, [draft, pronto]);
+
+  // Autosave no servidor (debounced) — é o que permite abrir a pelada em
+  // outro aparelho e continuar de onde parou. Erros de rede ficam
+  // silenciosos (o rascunho já está salvo no localStorage deste aparelho).
+  useEffect(() => {
+    if (!pronto || !draft) return;
+    const timer = setTimeout(() => {
+      saveRascunho(pin, draft).catch((e) => {
+        if (e instanceof FutebolApiError && e.status === 401) {
+          onAuthError();
+        }
+      });
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, [draft, pronto, pin, onAuthError]);
 
   const recarregarJogadores = useCallback(async () => {
     try {
@@ -144,6 +172,13 @@ function FutebolContent({
     if (!novaData) return;
     setDraft(carregarDraft(novaData) ?? criarDraftVazio(novaData));
     setErroEnvio(null);
+    getRascunho(novaData)
+      .then((remoto) => {
+        if (remoto) setDraft(remoto);
+      })
+      .catch(() => {
+        // sem conexão: segue com o rascunho local mesmo
+      });
   };
 
   const toggleAttendance = (id: number) => {
