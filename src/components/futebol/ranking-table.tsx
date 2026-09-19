@@ -14,41 +14,17 @@ const DESTAQUE_LINHA = [
 ];
 const DESTAQUE_PONTOS = ["text-amber-300", "text-slate-200", "text-orange-400"];
 
-/**
- * "Overall" do jogador (0 a ~100): combina taxa de vitória (pontos por
- * jogo, peso maior) com participação em gols/assistências (peso menor).
- * Um fator de "maturidade" — que cresce com o número de jogos mas nunca
- * chega a 1 — limita o quanto desse desempenho já pode aparecer: com só
- * 1 jogo, o resultado fica sempre entre 50 e 60, não importa o quão bem
- * (ou mal) o jogador se saiu; conforme mais jogos acontecem, a faixa
- * acessível se abre, mas chegar perto de 100 exige muitos jogos E
- * desempenho consistente — não é algo que uma pelada isolada garante.
- */
-function calcularOverall(jogador: Jogador): number {
+/** Média de participações em gol (gols + assistências) por partida jogada. */
+function calcularMediaParticipacoes(jogador: Jogador): number {
   if (jogador.jogos <= 0) return 0;
-
-  const pontosPorJogo = jogador.pontos / jogador.jogos;
-  const participacaoPorJogo =
-    (jogador.gols + jogador.assistencias) / jogador.jogos;
-
-  const termoVitoria = Math.min(1, pontosPorJogo / 3);
-  // Satura suavemente em vez de travar num teto: com min(1, participação),
-  // qualquer jogador com 1+ participação por jogo empatava em 1, igualando
-  // quem fez 1 gol com quem fez 6. Essa curva nunca empata dois totais
-  // diferentes — cada gol/assistência a mais sempre soma algo, só que com
-  // retorno decrescente.
-  const termoParticipacao =
-    participacaoPorJogo / (participacaoPorJogo + 0.5);
-
-  const desempenho = 0.7 * termoVitoria + 0.3 * termoParticipacao;
-  const maturidade = jogador.jogos / (jogador.jogos + 4);
-
-  return 50 + 50 * maturidade * desempenho;
+  return (jogador.gols + jogador.assistencias) / jogador.jogos;
 }
 
 export function RankingTable({ jogadores }: RankingTableProps) {
   const ordenados = [...jogadores].sort(
-    (a, b) => b.pontos - a.pontos || calcularOverall(b) - calcularOverall(a)
+    (a, b) =>
+      b.pontos - a.pontos ||
+      calcularMediaParticipacoes(b) - calcularMediaParticipacoes(a)
   );
 
   if (ordenados.length === 0) {
@@ -83,7 +59,7 @@ export function RankingTable({ jogadores }: RankingTableProps) {
               Assist.
             </th>
             <th scope="col" className="px-4 py-3 text-right">
-              Overall
+              Média Part.
             </th>
           </tr>
         </thead>
@@ -129,7 +105,7 @@ export function RankingTable({ jogadores }: RankingTableProps) {
                   {jogador.assistencias}
                 </td>
                 <td className="px-4 py-3 text-right text-white/70">
-                  {calcularOverall(jogador).toFixed(1)}%
+                  {calcularMediaParticipacoes(jogador).toFixed(2)}
                 </td>
               </tr>
             );

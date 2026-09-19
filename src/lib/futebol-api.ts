@@ -1,4 +1,4 @@
-import type { Jogador, PeladaDraft } from "./futebol-types";
+import type { Jogador, JogadorHistorico, PartidaHistorico, PeladaDraft } from "./futebol-types";
 
 const API_URL = "/api/futebol.php";
 
@@ -96,6 +96,47 @@ export async function getRanking(): Promise<Jogador[]> {
     throw new FutebolApiError("Resposta inválida do servidor.", 0);
   }
   return body.jogadores.map(mapearJogador);
+}
+
+interface JogadorHistoricoBruto {
+  id: number | string;
+  nome: string;
+  mensalista: number | string;
+  timeNumero: number | string;
+  gols: number | string;
+  assistencias: number | string;
+}
+
+interface PartidaHistoricoBruta {
+  numTimes: number | string;
+  placar: [number, number] | null;
+  jogadores: JogadorHistoricoBruto[];
+}
+
+function mapearJogadorHistorico(bruto: JogadorHistoricoBruto): JogadorHistorico {
+  return {
+    id: Number(bruto.id),
+    nome: bruto.nome,
+    mensalista: Number(bruto.mensalista) === 1,
+    timeNumero: Number(bruto.timeNumero),
+    gols: Number(bruto.gols),
+    assistencias: Number(bruto.assistencias),
+  };
+}
+
+/** Estatísticas da pelada já finalizada numa data, ou `null` se não houve pelada registrada nesse dia. Leitura não exige PIN — mesmo padrão de `players`/`ranking`. */
+export async function getPartidaPorData(data: string): Promise<PartidaHistorico | null> {
+  const { partida } = await chamar<{ partida: PartidaHistoricoBruta | null }>(
+    "partida_por_data",
+    {},
+    { data }
+  );
+  if (!partida) return null;
+  return {
+    numTimes: Number(partida.numTimes),
+    placar: partida.placar,
+    jogadores: partida.jogadores.map(mapearJogadorHistorico),
+  };
 }
 
 export async function addPlayer(

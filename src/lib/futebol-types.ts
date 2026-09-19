@@ -34,3 +34,19 @@ export interface PeladaDraft {
   /** Jogadores escalados como goleiro só nessa pelada (não é um dado da tabela geral). */
   goleiros: number[];
 }
+
+export interface JogadorHistorico {
+  id: number;
+  nome: string;
+  mensalista: boolean;
+  timeNumero: number;
+  gols: number;
+  assistencias: number;
+}
+
+/** Estatísticas de uma pelada já finalizada, para consulta por data. */
+export interface PartidaHistorico {
+  numTimes: number;
+  placar: [number, number] | null;
+  jogadores: JogadorHistorico[];
+}

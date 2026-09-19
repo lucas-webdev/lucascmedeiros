@@ -107,24 +107,54 @@ try {
     }
 
     if ($method === 'GET' && $action === 'ranking') {
-        // Desempate pelo "overall" (mesma fórmula de calcularOverall em
-        // ranking-table.tsx, que é quem de fato decide a ordem exibida):
-        // taxa de vitória (peso 0.7) + participação em gols/assistências
-        // (peso 0.3), escalado por um fator de maturidade que cresce com
-        // o número de jogos mas nunca alcança 1.
+        // Desempate pela média de participações em gol (gols + assistências
+        // por jogo) — mesma métrica de calcularMediaParticipacoes em
+        // ranking-table.tsx, que é quem de fato decide a ordem exibida.
         $stmt = $pdo->query(
             'SELECT id, nome, mensalista, pontos, jogos, gols, assistencias
              FROM jogadores WHERE ativo = 1
              ORDER BY pontos DESC,
-                      (CASE WHEN jogos > 0 THEN
-                        (jogos / (jogos + 4)) * (
-                          0.7 * LEAST(1, (pontos / jogos) / 3) +
-                          0.3 * (((gols + assistencias) / jogos) / (((gols + assistencias) / jogos) + 0.5))
-                        )
-                      ELSE 0 END) DESC,
+                      (CASE WHEN jogos > 0 THEN (gols + assistencias) / jogos ELSE 0 END) DESC,
                       nome ASC'
         );
         json_out(['jogadores' => $stmt->fetchAll()]);
+    }
+
+    if ($method === 'GET' && $action === 'partida_por_data') {
+        $data = (string)($_GET['data'] ?? '');
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $data)) {
+            json_out(['error' => 'data inválida'], 400);
+        }
+
+        $stmt = $pdo->prepare(
+            'SELECT id, num_times, placar_time1, placar_time2 FROM partidas WHERE data = ?'
+        );
+        $stmt->execute([$data]);
+        $partida = $stmt->fetch();
+
+        if (!$partida) {
+            json_out(['partida' => null]);
+        }
+
+        $stmtJogadores = $pdo->prepare(
+            'SELECT pj.jogador_id AS id, j.nome, j.mensalista, pj.time_numero AS timeNumero,
+                    pj.gols, pj.assistencias
+             FROM partida_jogadores pj
+             JOIN jogadores j ON j.id = pj.jogador_id
+             WHERE pj.partida_id = ?
+             ORDER BY j.nome ASC'
+        );
+        $stmtJogadores->execute([$partida['id']]);
+
+        json_out([
+            'partida' => [
+                'numTimes' => (int)$partida['num_times'],
+                'placar' => $partida['placar_time1'] !== null && $partida['placar_time2'] !== null
+                    ? [(int)$partida['placar_time1'], (int)$partida['placar_time2']]
+                    : null,
+                'jogadores' => $stmtJogadores->fetchAll(),
+            ],
+        ]);
     }
 
     if ($method === 'POST' && $action === 'add_player') {
@@ -234,6 +264,17 @@ try {
             json_out(['error' => 'jogadores inválido'], 400);
         }
 
+        // Checagem rápida antes de abrir a transação — cobre o caso comum
+        // (alguém finaliza duas vezes, ou dois aparelhos com o mesmo
+        // rascunho). A trava de verdade contra a corrida entre duas
+        // requisições simultâneas é a constraint UNIQUE em partidas.data,
+        // tratada abaixo no catch do insert.
+        $jaExiste = $pdo->prepare('SELECT id FROM partidas WHERE data = ?');
+        $jaExiste->execute([$data]);
+        if ($jaExiste->fetch()) {
+            json_out(['error' => 'Essa pelada já foi finalizada. Se precisar corrigir algo, ajuste direto no banco de dados.'], 409);
+        }
+
         $vencedorTime = null;
         $empate = false;
         if ($placarTime1 !== null && $placarTime2 !== null) {
@@ -246,10 +287,22 @@ try {
 
         $pdo->beginTransaction();
 
-        $stmt = $pdo->prepare(
-            'INSERT INTO partidas (data, num_times, placar_time1, placar_time2) VALUES (?, ?, ?, ?)'
-        );
-        $stmt->execute([$data, $numTimes, $placarTime1, $placarTime2]);
+        try {
+            $stmt = $pdo->prepare(
+                'INSERT INTO partidas (data, num_times, placar_time1, placar_time2) VALUES (?, ?, ?, ?)'
+            );
+            $stmt->execute([$data, $numTimes, $placarTime1, $placarTime2]);
+        } catch (PDOException $e) {
+            $pdo->rollBack();
+            // 1062 = entrada duplicada — duas requisições passaram pela
+            // checagem acima quase ao mesmo tempo (ex.: dois aparelhos
+            // finalizando junto); a constraint UNIQUE em partidas.data é
+            // quem realmente resolve a corrida.
+            if ((int)($e->errorInfo[1] ?? 0) === 1062) {
+                json_out(['error' => 'Essa pelada já foi finalizada (por outro aparelho, provavelmente). Se precisar corrigir algo, ajuste direto no banco de dados.'], 409);
+            }
+            throw $e;
+        }
         $partidaId = (int)$pdo->lastInsertId();
 
         $insertJogador = $pdo->prepare(

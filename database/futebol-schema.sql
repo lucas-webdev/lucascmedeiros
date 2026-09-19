@@ -19,7 +19,8 @@ CREATE TABLE partidas (
   num_times INT NOT NULL DEFAULT 2,
   placar_time1 INT NULL,
   placar_time2 INT NULL,
-  criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uniq_data (data)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE partida_jogadores (

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   FutebolApiError,
+  getPartidaPorData,
   getPlayers,
   getRascunho,
   saveRascunho,
@@ -16,7 +17,12 @@ import {
   salvarDraft,
 } from "@/lib/futebol-storage";
 import { sortearTimes } from "@/lib/futebol-teams";
-import type { Jogador, JogadorPresente, PeladaDraft } from "@/lib/futebol-types";
+import type {
+  Jogador,
+  JogadorPresente,
+  PartidaHistorico,
+  PeladaDraft,
+} from "@/lib/futebol-types";
 import { PinGate } from "./pin-gate";
 import { PlayerRoster } from "./player-roster";
 import { AttendanceList } from "./attendance-list";
@@ -24,6 +30,7 @@ import { PresentPlayers } from "./present-players";
 import { TeamDraw } from "./team-draw";
 import { Scoreboard } from "./scoreboard";
 import { RankingSection } from "./ranking-section";
+import { HistoricoPartida } from "./historico-partida";
 import {
   ResumoPeladaModal,
   calcularResumoPelada,
@@ -59,6 +66,7 @@ function FutebolContent({
   const [enviandoResultado, setEnviandoResultado] = useState(false);
   const [erroEnvio, setErroEnvio] = useState<string | null>(null);
   const [resumo, setResumo] = useState<ResumoPeladaData | null>(null);
+  const [historico, setHistorico] = useState<PartidaHistorico | null>(null);
 
   useEffect(() => {
     const data = hojeISO();
@@ -74,6 +82,14 @@ function FutebolContent({
       })
       .catch(() => {
         // sem conexão: segue com o rascunho local mesmo
+      });
+    // Se a data já tem uma pelada finalizada (ex.: reabrindo a página no
+    // mesmo dia, depois de já ter enviado o resultado), mostra as
+    // estatísticas dela em vez do formulário de presença/sorteio.
+    getPartidaPorData(data)
+      .then((partida) => setHistorico(partida))
+      .catch(() => {
+        // sem conexão: assume que ainda não foi finalizada
       });
   }, []);
 
@@ -172,12 +188,18 @@ function FutebolContent({
     if (!novaData) return;
     setDraft(carregarDraft(novaData) ?? criarDraftVazio(novaData));
     setErroEnvio(null);
+    setHistorico(null);
     getRascunho(novaData)
       .then((remoto) => {
         if (remoto) setDraft(remoto);
       })
       .catch(() => {
         // sem conexão: segue com o rascunho local mesmo
+      });
+    getPartidaPorData(novaData)
+      .then((partida) => setHistorico(partida))
+      .catch(() => {
+        // sem conexão: assume que ainda não foi finalizada
       });
   };
 
@@ -330,6 +352,20 @@ function FutebolContent({
       setResumo(
         calcularResumoPelada(jogadoresPresentes, draft.numTimes, placarFinal)
       );
+      setHistorico({
+        numTimes: draft.numTimes,
+        placar: placarFinal,
+        jogadores: jogadoresPresentes
+          .filter((j) => j.timeNumero !== null)
+          .map((j) => ({
+            id: j.id,
+            nome: j.nome,
+            mensalista: j.mensalista,
+            timeNumero: j.timeNumero as number,
+            gols: j.gols,
+            assistencias: j.assistencias,
+          })),
+      });
       limparDraft(draft.data);
       setDraft(criarDraftVazio(draft.data));
       await recarregarJogadores();
@@ -383,66 +419,74 @@ function FutebolContent({
         />
       </div>
 
-      {carregandoJogadores ? (
-        <p className="mb-6 text-sm text-white/60">Carregando jogadores...</p>
-      ) : (
-        <div className="mb-6">
-          <AttendanceList
-            jogadores={jogadores}
-            presentesIds={draft.presentesIds}
-            onToggle={toggleAttendance}
-          />
-        </div>
-      )}
-
-      <section className="mb-6">
-        <h3 className="mb-2 text-sm font-semibold text-white/80">
-          Presentes ({jogadoresPresentes.length})
-        </h3>
-        <PresentPlayers
-          jogadores={jogadoresPresentes}
-          onChangeStat={handleChangeStat}
-          onToggleGoleiro={handleToggleGoleiro}
-        />
-      </section>
-
-      <section className="mb-6">
-        <TeamDraw
-          presentesCount={draft.presentesIds.length}
-          numTimes={draft.numTimes}
-          onChangeNumTimes={handleChangeNumTimes}
-          onSortear={handleSortear}
-          onMoverJogador={handleMoverJogador}
-          times={draft.times}
-          jogadoresPorId={jogadoresPorId}
-        />
-      </section>
-
-      {draft.numTimes === 2 && Object.keys(draft.times).length > 0 && (
+      {historico ? (
         <section className="mb-6">
-          <Scoreboard placar={placarExibido} onChange={handleChangePlacar} />
+          <HistoricoPartida historico={historico} />
         </section>
-      )}
+      ) : (
+        <>
+          {carregandoJogadores ? (
+            <p className="mb-6 text-sm text-white/60">Carregando jogadores...</p>
+          ) : (
+            <div className="mb-6">
+              <AttendanceList
+                jogadores={jogadores}
+                presentesIds={draft.presentesIds}
+                onToggle={toggleAttendance}
+              />
+            </div>
+          )}
 
-      <section className="flex flex-col items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-        {erroEnvio && (
-          <p role="alert" className="text-sm text-red-300">
-            {erroEnvio}
-          </p>
-        )}
-        <button
-          type="button"
-          onClick={handleFinalizarPelada}
-          disabled={
-            enviandoResultado ||
-            draft.presentesIds.length === 0 ||
-            Object.keys(draft.times).length === 0
-          }
-          className="w-full max-w-xs rounded-md bg-[#2F4FE0] px-6 py-3 text-base font-semibold text-white transition-colors hover:bg-[#2643C8] disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          {enviandoResultado ? "Enviando..." : "Finalizar pelada"}
-        </button>
-      </section>
+          <section className="mb-6">
+            <h3 className="mb-2 text-sm font-semibold text-white/80">
+              Presentes ({jogadoresPresentes.length})
+            </h3>
+            <PresentPlayers
+              jogadores={jogadoresPresentes}
+              onChangeStat={handleChangeStat}
+              onToggleGoleiro={handleToggleGoleiro}
+            />
+          </section>
+
+          <section className="mb-6">
+            <TeamDraw
+              presentesCount={draft.presentesIds.length}
+              numTimes={draft.numTimes}
+              onChangeNumTimes={handleChangeNumTimes}
+              onSortear={handleSortear}
+              onMoverJogador={handleMoverJogador}
+              times={draft.times}
+              jogadoresPorId={jogadoresPorId}
+            />
+          </section>
+
+          {draft.numTimes === 2 && Object.keys(draft.times).length > 0 && (
+            <section className="mb-6">
+              <Scoreboard placar={placarExibido} onChange={handleChangePlacar} />
+            </section>
+          )}
+
+          <section className="flex flex-col items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
+            {erroEnvio && (
+              <p role="alert" className="text-sm text-red-300">
+                {erroEnvio}
+              </p>
+            )}
+            <button
+              type="button"
+              onClick={handleFinalizarPelada}
+              disabled={
+                enviandoResultado ||
+                draft.presentesIds.length === 0 ||
+                Object.keys(draft.times).length === 0
+              }
+              className="w-full max-w-xs rounded-md bg-[#2F4FE0] px-6 py-3 text-base font-semibold text-white transition-colors hover:bg-[#2643C8] disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {enviandoResultado ? "Enviando..." : "Finalizar pelada"}
+            </button>
+          </section>
+        </>
+      )}
 
       {resumo && (
         <ResumoPeladaModal resumo={resumo} onClose={() => setResumo(null)} />
