@@ -31,6 +31,7 @@ import { TeamDraw } from "./team-draw";
 import { Scoreboard } from "./scoreboard";
 import { RankingSection } from "./ranking-section";
 import { HistoricoPartida } from "./historico-partida";
+import { HistoricoSection } from "./historico-section";
 import {
   ResumoPeladaModal,
   calcularResumoPelada,
@@ -541,6 +542,10 @@ export function FutebolApp() {
 
         <section className="mt-8">
           <RankingSection refreshKey={rankingKey} />
+        </section>
+
+        <section className="mt-10">
+          <HistoricoSection />
         </section>
 
         <section className="mt-10">
