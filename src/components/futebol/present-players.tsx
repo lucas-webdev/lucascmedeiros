@@ -43,46 +43,49 @@ export function PresentPlayers({
     return a.nome.localeCompare(b.nome, "pt-BR");
   });
 
+  // Uma "linha" por jogador em duas camadas (nome/time/GK em cima, gols e
+  // assistências embaixo) em vez de <table>: no celular uma tabela larga
+  // forçava scroll horizontal e escondia colunas; assim só rola na vertical.
   return (
-    <div className="overflow-x-auto rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-white/10 text-left text-xs uppercase tracking-wide text-white/50">
-            <th scope="col" className="px-4 py-3">
-              Jogador
-            </th>
-            <th scope="col" className="px-4 py-3">
-              Goleiro
-            </th>
-            <th scope="col" className="px-4 py-3">
-              Time
-            </th>
-            <th scope="col" className="px-4 py-3">
-              Gols
-            </th>
-            <th scope="col" className="px-4 py-3">
-              Assistências
-            </th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-white/10">
-          {ordenados.map((jogador) => (
-            <tr key={jogador.id}>
-              <td className="px-4 py-3">
-                <span className="flex items-center gap-1.5 text-white">
-                  {jogador.nome}
-                  {jogador.mensalista && (
-                    <span
-                      aria-label="Mensalista"
-                      title="Mensalista"
-                      className="text-amber-400"
-                    >
-                      ★
-                    </span>
-                  )}
+    <ul className="divide-y divide-white/10 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm">
+      {ordenados.map((jogador, indice) => {
+        const visual = jogador.timeNumero
+          ? visualDoTime(jogador.timeNumero)
+          : null;
+        const comecaNovoTime =
+          indice > 0 && ordenados[indice - 1].timeNumero !== jogador.timeNumero;
+        return (
+          <li
+            key={jogador.id}
+            className={cn(
+              "px-4 py-3",
+              comecaNovoTime && "border-t-4 border-white/30"
+            )}
+          >
+            <div className="flex items-center gap-2">
+              {visual && (
+                <span
+                  role="img"
+                  aria-label={visual.nome}
+                  title={visual.nome}
+                  className={cn("shrink-0", visual.corTexto)}
+                >
+                  <VestIcon className="h-5 w-5" />
                 </span>
-              </td>
-              <td className="px-4 py-3">
+              )}
+              <span className="flex min-w-0 items-center gap-1.5 text-sm font-medium text-white">
+                <span className="truncate">{jogador.nome}</span>
+                {jogador.mensalista && (
+                  <span
+                    aria-label="Mensalista"
+                    title="Mensalista"
+                    className="text-amber-400"
+                  >
+                    ★
+                  </span>
+                )}
+              </span>
+              <label className="ml-auto flex shrink-0 cursor-pointer items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-white/70">
                 <input
                   type="checkbox"
                   checked={jogador.goleiro}
@@ -90,42 +93,43 @@ export function PresentPlayers({
                   aria-label={`${jogador.nome} joga de goleiro nessa pelada`}
                   className="h-5 w-5 rounded border-white/30 bg-white/10 accent-[#2F4FE0]"
                 />
-              </td>
-              <td className="px-4 py-3">
-                {jogador.timeNumero ? (
-                  <span
-                    className={cn(
-                      "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium",
-                      visualDoTime(jogador.timeNumero).corBadge
-                    )}
-                  >
-                    <VestIcon className="h-3 w-3 shrink-0" />
-                    {visualDoTime(jogador.timeNumero).nome}
-                  </span>
-                ) : (
-                  <span className="text-xs text-white/40">—</span>
-                )}
-              </td>
-              <td className="px-4 py-3">
-                <Stepper
-                  label={`gols de ${jogador.nome}`}
-                  value={jogador.gols}
-                  onChange={(valor) => onChangeStat(jogador.id, "gols", valor)}
-                />
-              </td>
-              <td className="px-4 py-3">
-                <Stepper
-                  label={`assistências de ${jogador.nome}`}
-                  value={jogador.assistencias}
-                  onChange={(valor) =>
-                    onChangeStat(jogador.id, "assistencias", valor)
-                  }
-                />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+                GK
+              </label>
+            </div>
+
+            <div className="mt-2 grid grid-cols-2">
+              <div className="flex justify-start">
+                <div>
+                  <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-white/50">
+                    Gols
+                  </p>
+                  <Stepper
+                    label={`gols de ${jogador.nome}`}
+                    value={jogador.gols}
+                    onChange={(valor) =>
+                      onChangeStat(jogador.id, "gols", valor)
+                    }
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end border-l border-white/20">
+                <div>
+                  <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-white/50">
+                    Assistências
+                  </p>
+                  <Stepper
+                    label={`assistências de ${jogador.nome}`}
+                    value={jogador.assistencias}
+                    onChange={(valor) =>
+                      onChangeStat(jogador.id, "assistencias", valor)
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
