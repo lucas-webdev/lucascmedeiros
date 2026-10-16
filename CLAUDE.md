@@ -80,7 +80,7 @@ Use locale-aware `Link`, `useRouter`, `usePathname` from `@/i18n/navigation` (no
 
 Automated via GitHub Actions (`.github/workflows/deploy.yml`). Push to `main` triggers the pipeline:
 
-1. `npm ci` → `npm run build` (Node 20, static export to `out/`)
+1. `npm ci` → `npm run build` (Node 24, static export to `out/`)
 2. `lftp` mirrors `out/` to `/httpdocs/` on the hosting server via FTPS (clean deploy — deletes remote files first, 3 parallel connections)
 
 **Host:** lucascmedeiros.com.br via FTPS (`ftp.lucascmedeiros.com.br`)

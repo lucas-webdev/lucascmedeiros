@@ -53,6 +53,54 @@ body {
   outline-offset: 2px;
 }
 
+/* Despesas — tokens escopados à página (tema claro/escuro segue o sistema) */
+@theme inline {
+  --color-d-bg: var(--d-bg);
+  --color-d-card: var(--d-card);
+  --color-d-fg: var(--d-fg);
+  --color-d-muted: var(--d-muted);
+  --color-d-line: var(--d-line);
+  --color-d-ok: var(--d-ok);
+  --color-d-warn: var(--d-warn);
+  --color-d-bad: var(--d-bad);
+  --color-d-accent: var(--d-accent);
+  --color-d-accent-fg: var(--d-accent-fg);
+}
+
+:root:has(.despesas) {
+  --d-bg: #f3f4f6;
+  --d-card: #ffffff;
+  --d-fg: #0f172a;
+  --d-muted: #64748b;
+  --d-line: #e2e8f0;
+  --d-ok: #059669;
+  --d-warn: #d97706;
+  --d-bad: #dc2626;
+  --d-accent: #0f766e;
+  --d-accent-fg: #ffffff;
+  overscroll-behavior-y: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:has(.despesas) {
+    --d-bg: #0b0f17;
+    --d-card: #151b26;
+    --d-fg: #f1f5f9;
+    --d-muted: #94a3b8;
+    --d-line: #263041;
+    --d-ok: #34d399;
+    --d-warn: #fbbf24;
+    --d-bad: #f87171;
+    --d-accent: #2dd4bf;
+    --d-accent-fg: #04201c;
+  }
+}
+
+body:has(.despesas) {
+  background-color: var(--d-bg);
+  color: var(--d-fg);
+}
+
 /* Futebol Onda BH — static sound-wave ring texture behind the page content */
 .futebol-wave-ring {
   fill: none;
