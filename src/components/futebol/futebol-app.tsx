@@ -219,6 +219,14 @@ function FutebolContent({
             (pid) => pid !== id
           );
         }
+      } else {
+        // Sorteio já feito: quem chega depois entra num time aleatório,
+        // sem refazer o sorteio — a organização acerta pelas setas se precisar.
+        const chaves = Object.keys(times).map(Number);
+        if (chaves.length > 0) {
+          const sorteado = chaves[Math.floor(Math.random() * chaves.length)];
+          times[sorteado] = [...times[sorteado], id];
+        }
       }
 
       return { ...prev, presentesIds, times };
