@@ -101,6 +101,41 @@ body:has(.despesas) {
   color: var(--d-fg);
 }
 
+/* Despesas Leti — mesmos tokens d-*, com destaque vermelho */
+:root:has(.despesas-leti) {
+  --d-bg: #fdf2f5;
+  --d-card: #ffffff;
+  --d-fg: #1f1218;
+  --d-muted: #7a5c68;
+  --d-line: #f0dde3;
+  --d-ok: #059669;
+  --d-warn: #d97706;
+  --d-bad: #b91c1c;
+  --d-accent: #be123c;
+  --d-accent-fg: #ffffff;
+  overscroll-behavior-y: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:has(.despesas-leti) {
+    --d-bg: #140a10;
+    --d-card: #1e1218;
+    --d-fg: #f8eef2;
+    --d-muted: #b6949f;
+    --d-line: #35212a;
+    --d-ok: #34d399;
+    --d-warn: #fbbf24;
+    --d-bad: #f87171;
+    --d-accent: #fb7185;
+    --d-accent-fg: #2a0510;
+  }
+}
+
+body:has(.despesas-leti) {
+  background-color: var(--d-bg);
+  color: var(--d-fg);
+}
+
 /* Futebol Onda BH — static sound-wave ring texture behind the page content */
 .futebol-wave-ring {
   fill: none;

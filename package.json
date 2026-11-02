@@ -9,7 +9,10 @@
     "lint": "next lint",
     "despesas:api:push": "cd despesas/apps-script && clasp push -f",
     "despesas:api:deploy": "node --env-file=.env despesas/scripts/deploy-api.mjs",
-    "despesas:api:logs": "cd despesas/apps-script && clasp logs"
+    "despesas:api:logs": "cd despesas/apps-script && clasp logs",
+    "despesas-leti:api:push": "cd despesas-leti/apps-script && clasp push -f",
+    "despesas-leti:api:deploy": "node --env-file=.env despesas-leti/scripts/deploy-api.mjs",
+    "despesas-leti:api:logs": "cd despesas-leti/apps-script && clasp logs"
   },
   "dependencies": {
     "next": "^16.1.6",

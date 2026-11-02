@@ -10,7 +10,7 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
-  { ignores: ["despesas/apps-script/**", "public/**"] },
+  { ignores: ["despesas/apps-script/**", "despesas-leti/apps-script/**", "public/**"] },
   ...compat.extends("next/core-web-vitals"),
 ];
 
