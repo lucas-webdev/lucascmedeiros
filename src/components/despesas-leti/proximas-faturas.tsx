@@ -36,10 +36,18 @@ export function ProximasFaturas({
               aria-current={p.mes === mesSelecionado ? "true" : undefined}
               className={cn(
                 "flex w-full items-center gap-3 px-4 py-3 text-left active:bg-d-line",
-                p.mes === mesSelecionado && "bg-d-line/50"
+                p.mes === mesSelecionado &&
+                  "bg-d-accent/15 shadow-[inset_4px_0_0_var(--d-accent)]"
               )}
             >
-              <span className="w-14 shrink-0 text-sm font-medium">{mesCurto(p.mes, hoje)}</span>
+              <span
+                className={cn(
+                  "w-14 shrink-0 text-sm",
+                  p.mes === mesSelecionado ? "font-bold" : "font-medium"
+                )}
+              >
+                {mesCurto(p.mes, hoje)}
+              </span>
               <span className="h-2 min-w-0 flex-1 overflow-hidden rounded-full bg-d-line">
                 <span
                   className={cn(

@@ -6,13 +6,13 @@
   "scope": "/despesas-leti/",
   "start_url": "/despesas-leti/",
   "display": "standalone",
-  "background_color": "#140a10",
-  "theme_color": "#9d174d",
+  "background_color": "#190e21",
+  "theme_color": "#190e21",
   "icons": [
-    { "src": "/despesas-leti/icon-192.png?v=1", "sizes": "192x192", "type": "image/png" },
-    { "src": "/despesas-leti/icon-512.png?v=1", "sizes": "512x512", "type": "image/png" },
+    { "src": "/despesas-leti/icon-192.png?v=2", "sizes": "192x192", "type": "image/png" },
+    { "src": "/despesas-leti/icon-512.png?v=2", "sizes": "512x512", "type": "image/png" },
     {
-      "src": "/despesas-leti/icon-512-maskable.png?v=1",
+      "src": "/despesas-leti/icon-512-maskable.png?v=2",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"

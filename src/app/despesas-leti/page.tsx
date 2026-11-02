@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "Leti · Gastos",
   description: "Fatura do cartão, parcelas e gastos do mês.",
   robots: { index: false, follow: false },
-  manifest: "/despesas-leti/manifest.webmanifest?v=1",
+  manifest: "/despesas-leti/manifest.webmanifest?v=2",
   icons: {
     icon: "/despesas-leti/icon-192.png",
     apple: "/despesas-leti/apple-touch-icon.png",
@@ -23,8 +23,8 @@ export const viewport: Viewport = {
   viewportFit: "cover",
   colorScheme: "light dark",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fdf2f5" },
-    { media: "(prefers-color-scheme: dark)", color: "#140a10" },
+    { media: "(prefers-color-scheme: light)", color: "#f7f1fb" },
+    { media: "(prefers-color-scheme: dark)", color: "#190e21" },
   ],
 };
 

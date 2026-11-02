@@ -11,13 +11,13 @@
  *
  * Para forçar atualização do cache, incremente VERSAO.
  */
-const VERSAO = "leti-gastos-v1";
+const VERSAO = "leti-gastos-v2";
 const ESCOPO = "/despesas-leti/";
 const SHELL = [
   ESCOPO,
-  "/despesas-leti/manifest.webmanifest?v=1",
-  "/despesas-leti/icon-192.png?v=1",
-  "/despesas-leti/icon-512.png?v=1",
+  "/despesas-leti/manifest.webmanifest?v=2",
+  "/despesas-leti/icon-192.png?v=2",
+  "/despesas-leti/icon-512.png?v=2",
   "/despesas-leti/apple-touch-icon.png",
 ];
 

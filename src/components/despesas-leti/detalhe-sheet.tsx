@@ -112,7 +112,8 @@ export function DetalheSheet({
                     key={p.parcela}
                     className={cn(
                       "flex items-center justify-between px-4 py-2.5 text-sm",
-                      p.mes === mes && "bg-d-line/50 font-semibold"
+                      p.mes === mes &&
+                        "bg-d-accent/15 font-semibold shadow-[inset_4px_0_0_var(--d-accent)]"
                     )}
                   >
                     <span>

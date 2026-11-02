@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 const saida = (nome) =>
   fileURLToPath(new URL(`../../public/despesas-leti/${nome}`, import.meta.url));
 
-// Anel dividido em 5 parcelas (3 cheias, 2 vazias) sobre degradê vinho → roxo.
+// Anel dividido em 5 parcelas (3 cheias, 2 vazias) sobre degradê roxo claro → roxo escuro.
 // Sem texto, para não depender de fontes.
 function svg({ tamanho, escala, cantos }) {
   const r = 150;
@@ -23,8 +23,8 @@ function svg({ tamanho, escala, cantos }) {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${tamanho}" height="${tamanho}" viewBox="0 0 512 512">
   <defs>
     <linearGradient id="fundo" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#be185d"/>
-      <stop offset="1" stop-color="#6b21a8"/>
+      <stop offset="0" stop-color="#b44bf0"/>
+      <stop offset="1" stop-color="#5b21b6"/>
     </linearGradient>
   </defs>
   <rect width="512" height="512" rx="${cantos}" fill="url(#fundo)"/>
