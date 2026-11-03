@@ -1,7 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { formatarMoeda } from "@/lib/despesas-format";
 import type { LancamentoPendente, UltimoLancamento } from "@/lib/despesas-types";
+import { LancamentoItem } from "./lancamento-item";
+
+const PASSO = 5;
 
 interface UltimosSecaoProps {
   ultimos: UltimoLancamento[];
@@ -14,6 +18,7 @@ function dataCurta(dataISO: string): string {
 }
 
 export function UltimosSecao({ ultimos, pendentes, onDescartar }: UltimosSecaoProps) {
+  const [visiveis, setVisiveis] = useState(PASSO);
   if (ultimos.length === 0 && pendentes.length === 0) return null;
 
   return (
@@ -52,25 +57,19 @@ export function UltimosSecao({ ultimos, pendentes, onDescartar }: UltimosSecaoPr
             </span>
           </li>
         ))}
-        {ultimos.map((u, i) => (
-          <li
-            key={`${u.descricao}-${u.valor}-${i}`}
-            className="flex items-center justify-between gap-3 px-4 py-3"
-          >
-            <span className="min-w-0">
-              <span className="block truncate font-medium">{u.descricao}</span>
-              <span className="block truncate text-xs text-d-muted">
-                {[u.data, u.categoria, `${u.forma} ${u.conta}`.trim(), u.obs]
-                  .filter(Boolean)
-                  .join(" · ")}
-              </span>
-            </span>
-            <span className="shrink-0 text-sm tabular-nums">
-              {formatarMoeda(u.valor)}
-            </span>
-          </li>
+        {ultimos.slice(0, visiveis).map((u, i) => (
+          <LancamentoItem key={`${u.descricao}-${u.valor}-${i}`} lancamento={u} />
         ))}
       </ul>
+      {ultimos.length > visiveis && (
+        <button
+          type="button"
+          onClick={() => setVisiveis((v) => v + PASSO)}
+          className="mt-3 w-full rounded-xl py-2 text-center text-sm font-medium text-d-accent active:bg-d-line"
+        >
+          Mostrar mais {Math.min(PASSO, ultimos.length - visiveis)}
+        </button>
+      )}
     </section>
   );
 }

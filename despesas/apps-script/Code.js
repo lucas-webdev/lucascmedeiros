@@ -90,34 +90,66 @@ function registrarLancamento(idLocal, r) {
   PropertiesService.getScriptProperties().setProperty(PROP_LANCAMENTOS, JSON.stringify(mapa));
 }
 
+const MAX_PARCELAS = 36;
+
 /**
- * p = { data: 'YYYY-MM-DD', descricao, categoria, valor, forma, conta, obs?, mes?, idLocal? }
+ * p = { data: 'YYYY-MM-DD', descricao, categoria, valor, forma, conta, obs?, mes?, parcelas?, idLocal? }
  * Se `mes` vier preenchido, ele manda. Senão o mês é calculado pela regra de corte.
+ * `parcelas` > 1 (só crédito): `valor` é o TOTAL da compra. Grava uma linha por parcela,
+ * uma em cada mês a partir do mês da fatura. Parcelas além de dezembro ficam de fora
+ * (a planilha é anual) e voltam em `foraDoAno`.
  */
 function lancarGasto(p) {
   const valor = Number(p.valor);
+  const parcelas = p.parcelas === undefined || p.parcelas === '' ? 1 : Number(p.parcelas);
   if (!p.descricao || !String(p.descricao).trim()) throw new Error('descrição obrigatória');
   if (!(valor > 0)) throw new Error('valor inválido');
+  if (!Number.isInteger(parcelas) || parcelas < 1 || parcelas > MAX_PARCELAS) throw new Error('número de parcelas inválido');
   if (!FORMAS.includes(p.forma)) throw new Error('forma de pagamento inválida');
+  if (parcelas > 1 && p.forma !== 'Crédito') throw new Error('só compras no crédito podem ser parceladas');
   if (!CONTAS.includes(p.conta)) throw new Error('conta inválida');
   if (!listarCategorias().includes(p.categoria)) throw new Error('categoria inválida');
 
   const mes = p.mes || mesDestino(p.data, p.forma, p.conta);
-  const aba = SpreadsheetApp.getActive().getSheetByName(mes);
-  if (!aba) throw new Error(`aba "${mes}" não existe`);
+  const ss = SpreadsheetApp.getActive();
+  const inicio = MESES.indexOf(mes);
+  const gravaveis = Math.min(parcelas, MESES.length - inicio);
 
-  const linha = proximaLinhaLivre(aba);
+  // Confere todas as abas antes de gravar qualquer linha, pra não deixar parcelamento pela metade.
+  for (let i = 0; i < gravaveis; i++) {
+    if (!ss.getSheetByName(MESES[inicio + i])) throw new Error(`aba "${MESES[inicio + i]}" não existe`);
+  }
+
   const [, mm, dd] = p.data.split('-');
-  const obs = ['app', p.obs].filter(Boolean).join(' · ');
+  const descricao = String(p.descricao).trim();
+  const valores = dividirParcelas(valor, parcelas);
+  let primeira = null;
 
-  // Data e observação como texto, senão "1/3" vira data
-  aba.getRange(linha, 1).setNumberFormat('@');
-  aba.getRange(linha, 7).setNumberFormat('@');
-  aba.getRange(linha, 1, 1, 7).setValues([[
-    `${dd}/${mm}`, String(p.descricao).trim(), p.categoria, valor, p.forma, p.conta, obs,
-  ]]);
+  for (let i = 0; i < gravaveis; i++) {
+    const aba = ss.getSheetByName(MESES[inicio + i]);
+    const linha = proximaLinhaLivre(aba);
+    const sufixo = parcelas > 1 ? ` (${i + 1}/${parcelas})` : '';
+    const obs = ['app', parcelas > 1 ? `total ${valor.toFixed(2).replace('.', ',')}` : '', p.obs]
+      .filter(Boolean).join(' · ');
 
-  return { aba: mes, linha };
+    // Data e observação como texto, senão "1/3" vira data
+    aba.getRange(linha, 1).setNumberFormat('@');
+    aba.getRange(linha, 7).setNumberFormat('@');
+    aba.getRange(linha, 1, 1, 7).setValues([[
+      `${dd}/${mm}`, descricao + sufixo, p.categoria, valores[i], p.forma, p.conta, obs,
+    ]]);
+    if (!primeira) primeira = { aba: MESES[inicio], linha };
+  }
+
+  return { aba: primeira.aba, linha: primeira.linha, parcelas, foraDoAno: parcelas - gravaveis };
+}
+
+/** Divide em centavos; a diferença do arredondamento vai pra primeira parcela. */
+function dividirParcelas(total, n) {
+  const centavos = Math.round(total * 100);
+  const base = Math.floor(centavos / n);
+  const resto = centavos - base * n;
+  return Array.from({ length: n }, (_, i) => (base + (i === 0 ? resto : 0)) / 100);
 }
 
 function mesDestino(dataISO, forma, conta) {
@@ -208,7 +240,34 @@ function painel(mes) {
     categorias,
     fixosPendentes,
     ultimos: gastos.slice(-15).reverse(),
+    lancamentos: gastos.slice().reverse(),
+    proximasFaturas: proximasFaturas(mes),
   };
+}
+
+/**
+ * Total no crédito (por cartão) de cada mês depois de `mes` que tenha algum valor.
+ * Como o lançamento já cai na aba da fatura, a aba do mês é a fatura daquele mês.
+ */
+function proximasFaturas(mes) {
+  const ss = SpreadsheetApp.getActive();
+  const faturas = [];
+  for (let i = MESES.indexOf(mes) + 1; i < MESES.length; i++) {
+    const aba = ss.getSheetByName(MESES[i]);
+    if (!aba) continue;
+    const vals = aba.getRange(1, 1, aba.getLastRow(), 6).getValues();
+    const totalIdx = vals.findIndex(r => r[2] === 'TOTAL GASTOS');
+    const porConta = {};
+    vals.slice(3, totalIdx < 0 ? vals.length : totalIdx).forEach(r => {
+      if (r[1] === '' || typeof r[3] !== 'number' || r[4] !== 'Crédito') return;
+      if (IGNORAR_NO_TOTAL.includes(r[2])) return;
+      porConta[r[5]] = (porConta[r[5]] || 0) + r[3];
+    });
+    const cartoes = Object.keys(porConta).map(conta => ({ conta, total: arred(porConta[conta]) }));
+    const total = arred(cartoes.reduce((s, c) => s + c.total, 0));
+    if (total > 0) faturas.push({ mes: MESES[i], total, cartoes });
+  }
+  return faturas;
 }
 
 /** Lê Previsto por categoria e Entrada prevista do Controle Geral. */

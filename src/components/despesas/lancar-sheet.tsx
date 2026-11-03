@@ -18,6 +18,8 @@ interface LancarSheetProps {
   onLancar: (lancamento: NovoLancamento, metodoId: string) => Promise<void>;
 }
 
+const OPCOES_PARCELAS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
 const chip =
   "rounded-full border px-3.5 py-2 text-sm transition-colors active:opacity-70";
 const chipOff = "border-d-line bg-d-card text-d-fg";
@@ -35,6 +37,7 @@ export function LancarSheet({
   const [metodoId, setMetodoId] = useState(lerMetodoId);
   const [data, setData] = useState(hojeISO);
   const [obs, setObs] = useState("");
+  const [parcelas, setParcelas] = useState(1);
   const [mais, setMais] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -91,6 +94,8 @@ export function LancarSheet({
   const valor = parseValor(valorTexto);
   const valorValido = Number.isFinite(valor) && valor > 0;
   const metodo = METODOS_PAGAMENTO.find((m) => m.id === metodoId) ?? METODOS_PAGAMENTO[0];
+  const credito = metodo.forma === "Crédito";
+  const nParcelas = credito ? parcelas : 1;
   const podeEnviar = valorValido && !!categoria && descricao.trim().length > 0 && !enviando;
 
   const infoCategoria = painel?.categorias.find((c) => c.nome === categoria);
@@ -114,6 +119,7 @@ export function LancarSheet({
           forma: metodo.forma,
           conta: metodo.conta,
           obs: obs.trim(),
+          ...(nParcelas > 1 && { parcelas: nParcelas }),
         },
         metodo.id
       );
@@ -237,6 +243,32 @@ export function LancarSheet({
             </div>
           </div>
 
+          {credito && (
+            <div>
+              <p className="mb-2 text-sm font-medium text-d-muted">Parcelas</p>
+              <div className="flex flex-wrap gap-2">
+                {OPCOES_PARCELAS.map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    aria-pressed={parcelas === n}
+                    onClick={() => setParcelas(n)}
+                    className={cn(chip, "py-1.5", parcelas === n ? chipOn : chipOff)}
+                  >
+                    {n === 1 ? "À vista" : `${n}x`}
+                  </button>
+                ))}
+              </div>
+              {nParcelas > 1 && (
+                <p className="mt-2 text-sm tabular-nums text-d-muted">
+                  {valorValido
+                    ? `${nParcelas}x de ${formatarMoeda(valor / nParcelas)} · o valor acima é o total`
+                    : "Digite o valor total da compra"}
+                </p>
+              )}
+            </div>
+          )}
+
           <div>
             <label htmlFor="data" className="mb-2 block text-sm font-medium text-d-muted">
               Data
@@ -286,7 +318,11 @@ export function LancarSheet({
             disabled={!podeEnviar}
             className="w-full rounded-xl bg-d-accent px-4 py-3.5 text-base font-semibold text-d-accent-fg disabled:opacity-40"
           >
-            {enviando ? "Lançando…" : valorValido ? `Lançar ${formatarMoeda(valor)}` : "Lançar"}
+            {enviando
+              ? "Lançando…"
+              : valorValido
+                ? `Lançar ${formatarMoeda(valor)}${nParcelas > 1 ? ` em ${nParcelas}x` : ""}`
+                : "Lançar"}
           </button>
         </div>
       </form>

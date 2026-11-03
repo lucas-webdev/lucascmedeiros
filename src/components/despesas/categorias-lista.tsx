@@ -35,14 +35,19 @@ function ordenar(categorias: CategoriaPainel[]): CategoriaPainel[] {
 
 export function CategoriasLista({
   categorias,
+  onAbrir,
 }: {
   categorias: CategoriaPainel[];
+  onAbrir: (nome: string) => void;
 }) {
   const ordenadas = useMemo(() => ordenar(categorias), [categorias]);
 
   return (
     <section aria-labelledby="titulo-categorias" className="mt-8">
-      <h2 id="titulo-categorias" className="mb-3 text-sm font-semibold text-d-muted">
+      <h2
+        id="titulo-categorias"
+        className="mb-3 text-sm font-semibold text-d-muted"
+      >
         Categorias
       </h2>
       <ul className="divide-y divide-d-line overflow-hidden rounded-2xl bg-d-card">
@@ -50,37 +55,43 @@ export function CategoriasLista({
           const nivel = nivelDe(c);
           const largura = Math.min(c.pct ?? (c.realizado > 0 ? 100 : 0), 100);
           return (
-            <li key={c.nome} className="px-4 py-3">
-              <div className="flex items-baseline justify-between gap-3">
-                <span className="truncate font-medium">{c.nome}</span>
-                <span
-                  className={cn(
-                    "shrink-0 text-sm font-medium tabular-nums",
-                    COR_TEXTO[nivel]
-                  )}
-                >
-                  {c.disponivel < 0
-                    ? `${formatarMoeda(-c.disponivel)} acima`
-                    : `${formatarMoeda(c.disponivel)} livre`}
-                </span>
-              </div>
-              <div
-                className="mt-2 h-1.5 overflow-hidden rounded-full bg-d-line"
-                role="progressbar"
-                aria-label={`${c.nome}: ${Math.round(c.pct ?? 0)}% do previsto`}
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-valuenow={Math.round(largura)}
+            <li key={c.nome}>
+              <button
+                type="button"
+                onClick={() => onAbrir(c.nome)}
+                className="block w-full px-4 py-3 text-left active:bg-d-line"
               >
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="truncate font-medium">{c.nome}</span>
+                  <span
+                    className={cn(
+                      "shrink-0 text-sm font-medium tabular-nums",
+                      COR_TEXTO[nivel],
+                    )}
+                  >
+                    {c.disponivel < 0
+                      ? `${formatarMoeda(-c.disponivel)} acima`
+                      : `${formatarMoeda(c.disponivel)} livre`}
+                  </span>
+                </div>
                 <div
-                  className={cn("h-full rounded-full", COR_BARRA[nivel])}
-                  style={{ width: `${largura}%` }}
-                />
-              </div>
-              <p className="mt-1.5 text-xs text-d-muted tabular-nums">
-                {formatarMoeda(c.realizado)} de {formatarMoeda(c.previsto)}
-                {c.pct !== null && ` · ${Math.round(c.pct)}%`}
-              </p>
+                  className="mt-2 h-1.5 overflow-hidden rounded-full bg-d-line"
+                  role="progressbar"
+                  aria-label={`${c.nome}: ${Math.round(c.pct ?? 0)}% do previsto`}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={Math.round(largura)}
+                >
+                  <div
+                    className={cn("h-full rounded-full", COR_BARRA[nivel])}
+                    style={{ width: `${largura}%` }}
+                  />
+                </div>
+                <p className="mt-1.5 text-xs text-d-muted tabular-nums">
+                  {formatarMoeda(c.realizado)} de {formatarMoeda(c.previsto)}
+                  {c.pct !== null && ` · ${Math.round(c.pct)}%`}
+                </p>
+              </button>
             </li>
           );
         })}
