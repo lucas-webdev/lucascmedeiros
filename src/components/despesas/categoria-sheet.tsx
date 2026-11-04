@@ -9,10 +9,12 @@ interface CategoriaSheetProps {
   categoria: string;
   mes: string;
   lancamentos: UltimoLancamento[];
+  /** `false` quando o servidor não mandou a lista completa do mês (só os 15 últimos). */
+  completo: boolean;
   onFechar: () => void;
 }
 
-export function CategoriaSheet({ categoria, mes, lancamentos, onFechar }: CategoriaSheetProps) {
+export function CategoriaSheet({ categoria, mes, lancamentos, completo, onFechar }: CategoriaSheetProps) {
   useEffect(() => {
     const overflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -51,7 +53,11 @@ export function CategoriaSheet({ categoria, mes, lancamentos, onFechar }: Catego
         </div>
         <div className="overflow-y-auto px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-3">
           {lancamentos.length === 0 ? (
-            <p className="py-8 text-center text-sm text-d-muted">Nenhum lançamento neste mês.</p>
+            <p className="py-8 text-center text-sm text-d-muted">
+              {completo
+                ? "Nenhum lançamento neste mês."
+                : "O servidor ainda não enviou a lista completa do mês. Puxe para atualizar ou publique de novo o Apps Script."}
+            </p>
           ) : (
             <ul className="divide-y divide-d-line overflow-hidden rounded-2xl bg-d-card">
               {lancamentos.map((l, i) => (

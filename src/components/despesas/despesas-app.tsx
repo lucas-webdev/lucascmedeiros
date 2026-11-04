@@ -45,6 +45,18 @@ interface Dados {
   em: number;
 }
 
+function normalizar(texto: string): string {
+  return String(texto ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLowerCase();
+}
+
+function mesmaCategoria(a: string, b: string): boolean {
+  return normalizar(a) === normalizar(b);
+}
+
 function mesAtualDoAparelho(): string {
   return MESES[new Date().getMonth()];
 }
@@ -463,8 +475,9 @@ export function DespesasApp() {
           categoria={categoriaAberta}
           mes={dados.painel.mes}
           lancamentos={(dados.painel.lancamentos ?? dados.painel.ultimos).filter(
-            (l) => l.categoria === categoriaAberta
+            (l) => mesmaCategoria(l.categoria, categoriaAberta)
           )}
+          completo={!!dados.painel.lancamentos}
           onFechar={() => setCategoriaAberta(null)}
         />
       )}

@@ -45,6 +45,10 @@ export interface UltimoLancamento {
 
 export interface FaturaPrevista {
   mes: string;
+  /** Ano da fatura; passa do ano da planilha quando há parcelas em janeiro seguinte. */
+  ano?: number;
+  /** `false` para meses sem aba na planilha (só projeção de parcelas). */
+  navegavel?: boolean;
   total: number;
   cartoes: { conta: string; total: number }[];
 }

@@ -246,28 +246,86 @@ function painel(mes) {
 }
 
 /**
- * Total no crédito (por cartão) de cada mês depois de `mes` que tenha algum valor.
- * Como o lançamento já cai na aba da fatura, a aba do mês é a fatura daquele mês.
+ * Faturas dos meses depois de `mes` que tenham algum valor no crédito, por cartão.
+ * Soma o que já está lançado nas abas futuras e PROJETA as parcelas que ainda não foram
+ * lançadas: uma linha marcada "Parcela 1/5" (na observação) ou "Descrição (1/5)" gera as
+ * parcelas 2..5 nos meses seguintes. Parcelas já presentes na aba do mês não são contadas
+ * duas vezes. Meses depois de dezembro saem com `navegavel: false` (não há aba).
  */
 function proximasFaturas(mes) {
   const ss = SpreadsheetApp.getActive();
-  const faturas = [];
-  for (let i = MESES.indexOf(mes) + 1; i < MESES.length; i++) {
-    const aba = ss.getSheetByName(MESES[i]);
-    if (!aba) continue;
-    const vals = aba.getRange(1, 1, aba.getLastRow(), 6).getValues();
-    const totalIdx = vals.findIndex(r => r[2] === 'TOTAL GASTOS');
-    const porConta = {};
-    vals.slice(3, totalIdx < 0 ? vals.length : totalIdx).forEach(r => {
-      if (r[1] === '' || typeof r[3] !== 'number' || r[4] !== 'Crédito') return;
-      if (IGNORAR_NO_TOTAL.includes(r[2])) return;
-      porConta[r[5]] = (porConta[r[5]] || 0) + r[3];
-    });
-    const cartoes = Object.keys(porConta).map(conta => ({ conta, total: arred(porConta[conta]) }));
-    const total = arred(cartoes.reduce((s, c) => s + c.total, 0));
-    if (total > 0) faturas.push({ mes: MESES[i], total, cartoes });
+  const atual = MESES.indexOf(mes);
+  const ano = anoDaPlanilha();
+
+  const linhasPorMes = MESES.map(m => {
+    const aba = ss.getSheetByName(m);
+    return aba ? lerCredito(aba) : [];
+  });
+
+  const vistos = {};
+  linhasPorMes.forEach((linhas, i) => linhas.forEach(l => {
+    const p = parcelaDe(l);
+    if (p) vistos[`${i}|${p.base}|${l.conta}|${p.k}|${p.n}`] = true;
+  }));
+
+  const porMes = {};
+  const somar = (i, conta, valor) => {
+    porMes[i] = porMes[i] || {};
+    porMes[i][conta] = (porMes[i][conta] || 0) + valor;
+  };
+
+  linhasPorMes.forEach((linhas, i) => linhas.forEach(l => {
+    if (i > atual) somar(i, l.conta, l.valor);
+    const p = parcelaDe(l);
+    if (!p) return;
+    for (let j = 1; j <= p.n - p.k; j++) {
+      const alvo = i + j;
+      const chave = `${alvo}|${p.base}|${l.conta}|${p.k + j}|${p.n}`;
+      if (alvo <= atual || vistos[chave]) continue;
+      vistos[chave] = true;
+      somar(alvo, l.conta, l.valor);
+    }
+  }));
+
+  return Object.keys(porMes).map(Number).sort((a, b) => a - b).map(i => {
+    const cartoes = Object.keys(porMes[i]).map(conta => ({ conta, total: arred(porMes[i][conta]) }));
+    return {
+      mes: MESES[i % 12],
+      ano: ano + Math.floor(i / 12),
+      navegavel: i < MESES.length,
+      total: arred(cartoes.reduce((s, c) => s + c.total, 0)),
+      cartoes,
+    };
+  }).filter(f => f.total > 0);
+}
+
+/** Gastos no crédito de uma aba de mês, sem as categorias ignoradas no total. */
+function lerCredito(aba) {
+  const vals = aba.getRange(1, 1, aba.getLastRow(), 7).getValues();
+  const totalIdx = vals.findIndex(r => r[2] === 'TOTAL GASTOS');
+  return vals.slice(3, totalIdx < 0 ? vals.length : totalIdx)
+    .filter(r => r[1] !== '' && typeof r[3] === 'number' && r[4] === 'Crédito' && !IGNORAR_NO_TOTAL.includes(r[2]))
+    .map(r => ({ descricao: String(r[1]), categoria: r[2], valor: r[3], conta: r[5], obs: String(r[6] || '') }));
+}
+
+/** { base, k, n } se a linha é a parcela k de n ("Parcela 1/5" na obs ou "Nome (1/5)"). */
+function parcelaDe(l) {
+  let m = l.obs.match(/parcela\s*(\d+)\s*\/\s*(\d+)/i);
+  let base = l.descricao;
+  if (!m) {
+    m = l.descricao.match(/\((\d+)\/(\d+)\)\s*$/);
+    if (m) base = l.descricao.replace(/\s*\(\d+\/\d+\)\s*$/, '');
   }
-  return faturas;
+  if (!m) return null;
+  const k = Number(m[1]);
+  const n = Number(m[2]);
+  if (!(k >= 1 && n >= k)) return null;
+  return { base: base.trim().toLowerCase(), k, n };
+}
+
+function anoDaPlanilha() {
+  const m = SpreadsheetApp.getActive().getName().match(/(20\d{2})/);
+  return m ? Number(m[1]) : new Date().getFullYear();
 }
 
 /** Lê Previsto por categoria e Entrada prevista do Controle Geral. */
