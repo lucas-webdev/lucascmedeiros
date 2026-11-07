@@ -7,3 +7,6 @@ define('DB_NAME', 'lucascmedeiroscombr4');
 define('DB_USER', 'lucascmedeir4');
 define('DB_PASS', 'troque-me');
 define('ADMIN_PIN', 'troque-me');
+
+// Token de aplicação do BoardGameGeek (https://boardgamegeek.com/applications).
+define('BGG_TOKEN', 'troque-me');

@@ -53,7 +53,7 @@ body {
   outline-offset: 2px;
 }
 
-/* Despesas — tokens escopados à página (tema claro/escuro segue o sistema) */
+/* Despesas e Jogos — tokens escopados às páginas (tema claro/escuro segue o sistema) */
 @theme inline {
   --color-d-bg: var(--d-bg);
   --color-d-card: var(--d-card);
@@ -67,7 +67,7 @@ body {
   --color-d-accent-fg: var(--d-accent-fg);
 }
 
-:root:has(.despesas) {
+:root:has(.despesas, .jogos) {
   --d-bg: #f3f4f6;
   --d-card: #ffffff;
   --d-fg: #0f172a;
@@ -82,7 +82,7 @@ body {
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:has(.despesas) {
+  :root:has(.despesas, .jogos) {
     --d-bg: #0b0f17;
     --d-card: #151b26;
     --d-fg: #f1f5f9;
@@ -96,7 +96,7 @@ body {
   }
 }
 
-body:has(.despesas) {
+body:has(.despesas, .jogos) {
   background-color: var(--d-bg);
   color: var(--d-fg);
 }
