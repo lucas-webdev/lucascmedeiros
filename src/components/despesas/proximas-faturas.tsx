@@ -10,6 +10,7 @@ interface ProximasFaturasProps {
 
 export function ProximasFaturas({ faturas, onEscolher }: ProximasFaturasProps) {
   if (faturas.length === 0) return null;
+  const anoAtual = new Date().getFullYear();
 
   return (
     <section aria-labelledby="titulo-proximas" className="mt-8">
@@ -23,7 +24,7 @@ export function ProximasFaturas({ faturas, onEscolher }: ProximasFaturasProps) {
             <>
               <span className="min-w-0">
                 <span className="block font-medium">
-                  {navegavel ? f.mes : `${f.mes} ${f.ano ?? ""}`.trim()}
+                  {f.ano && f.ano !== anoAtual ? `${f.mes} ${f.ano}` : f.mes}
                 </span>
                 <span className="block truncate text-xs text-d-muted tabular-nums">
                   {f.cartoes.map((c) => `${c.conta} ${formatarMoeda(c.total)}`).join(" · ")}

@@ -45,9 +45,9 @@ export interface UltimoLancamento {
 
 export interface FaturaPrevista {
   mes: string;
-  /** Ano da fatura; passa do ano da planilha quando há parcelas em janeiro seguinte. */
+  /** Ano da fatura. As abas são cíclicas: depois de Dezembro vem Janeiro do ano seguinte. */
   ano?: number;
-  /** `false` para meses sem aba na planilha (só projeção de parcelas). */
+  /** `false` quando a fatura está a mais de 12 meses e repetiria uma aba já listada. */
   navegavel?: boolean;
   total: number;
   cartoes: { conta: string; total: number }[];
@@ -93,7 +93,7 @@ export interface LancamentoResposta {
   lancamento: {
     aba: string;
     linha: number;
-    /** Parcelas que não couberam na planilha do ano. */
+    /** Parcelas além da 12ª, que não cabem nas 12 abas. */
     foraDoAno?: number;
   };
   painel: Painel;
