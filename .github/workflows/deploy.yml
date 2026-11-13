@@ -30,6 +30,7 @@ jobs:
           FUTEBOL_DB_USER: ${{ secrets.FUTEBOL_DB_USER }}
           FUTEBOL_DB_PASSWORD: ${{ secrets.FUTEBOL_DB_PASSWORD }}
           FUTEBOL_PIN: ${{ secrets.FUTEBOL_PIN }}
+          BGG_TOKEN: ${{ secrets.BGG_API_KEY }}
         run: |
           cat > public/api/config.php <<PHP
           <?php
@@ -38,6 +39,7 @@ jobs:
           define('DB_USER', '$FUTEBOL_DB_USER');
           define('DB_PASS', '$FUTEBOL_DB_PASSWORD');
           define('ADMIN_PIN', '$FUTEBOL_PIN');
+          define('BGG_TOKEN', '$BGG_TOKEN');
           PHP
 
       - name: Build static export
