@@ -271,16 +271,29 @@ export function JogosApp() {
       )}
 
       <footer className="mt-10 border-t border-d-line pt-4 text-xs text-d-muted">
-        Dados fornecidos por{" "}
+        {/* Logo oficial "Powered by BGG" (exigido pelos termos da API), com a
+            versão para fundo escuro quando o sistema está no tema escuro. */}
         <a
           href="https://boardgamegeek.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="underline"
+          className="mt-3 inline-block"
         >
-          BoardGameGeek
-        </a>{" "}
-        (Powered by BGG).
+          <picture>
+            <source
+              media="(prefers-color-scheme: dark)"
+              srcSet="/jogos/powered-by-bgg-reversed-rgb.svg"
+              type="image/svg+xml"
+            />
+            <img
+              src="/jogos/powered-by-bgg-rgb.svg"
+              alt="Powered by BGG"
+              width={342}
+              height={76}
+              className="h-11 w-auto"
+            />
+          </picture>
+        </a>
       </footer>
     </div>
   );
