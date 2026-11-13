@@ -101,6 +101,11 @@ body:has(.despesas, .jogos) {
   color: var(--d-fg);
 }
 
+/* Jogos: com o quadro (modal) aberto, a página de trás não rola. */
+body:has(.jogos dialog[open]) {
+  overflow: hidden;
+}
+
 /* Futebol Onda BH — static sound-wave ring texture behind the page content */
 .futebol-wave-ring {
   fill: none;

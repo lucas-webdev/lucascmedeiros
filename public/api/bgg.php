@@ -8,7 +8,7 @@ declare(strict_types=1);
  * Por que existe: o BGG exige `Authorization: Bearer <token>` em toda chamada e
  * recomenda que as requisições saiam do servidor (com cache), nunca do browser.
  * O token fica em config.php (gerado no deploy a partir do GitHub Secret
- * BGG_TOKEN) e nunca chega ao frontend.
+ * BGG_API_KEY, gravado como BGG_TOKEN) e nunca chega ao frontend.
  *
  * GET /api/bgg.php?action=plays&username=NOME&page=1
  */
@@ -209,7 +209,7 @@ if ($pagina < 1 || $pagina > 500) {
 if (BGG_TOKEN === '') {
     json_out([
         'error' => 'Token do BGG não configurado no servidor.',
-        'detalhe' => 'Cadastre o GitHub Secret BGG_TOKEN e rode o deploy.',
+        'detalhe' => 'Cadastre o GitHub Secret BGG_API_KEY e rode o deploy.',
     ], 503);
 }
 

@@ -1,13 +1,20 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { JogosApiError, buscarPartidasBgg } from "@/lib/jogos-api";
-import { formatarData, formatarDuracao, resumir } from "@/lib/jogos-stats";
-import type {
-  Partida,
-  ProgressoBusca,
-  ResultadoBusca,
-} from "@/lib/jogos-types";
+import {
+  FILTROS_VAZIOS,
+  filtrarPartidas,
+  limitesDeData,
+  listarJogadores,
+  listarLocais,
+  type FiltrosPartidas as Filtros,
+} from "@/lib/jogos-filtros";
+import { resumir } from "@/lib/jogos-stats";
+import type { ProgressoBusca, ResultadoBusca } from "@/lib/jogos-types";
+import { CartaoPartida } from "./cartao-partida";
+import { FiltrosPartidas } from "./filtros-partidas";
+import { QuadroMarcos } from "./quadro-marcos";
 
 const CHAVE_USUARIO = "jogos:bgg-username";
 const USUARIO_PADRAO = "lucascmedeiros";
@@ -38,69 +45,6 @@ function textoProgresso(p: ProgressoBusca): string {
     : "Consultando o BoardGameGeek…";
 }
 
-function CartaoPartida({ partida }: { partida: Partida }) {
-  const duracao = formatarDuracao(partida.length);
-  const detalhes = [partida.location, duracao].filter(Boolean).join(" · ");
-
-  return (
-    <li className="rounded-xl border border-d-line bg-d-card p-4">
-      <div className="flex items-start justify-between gap-3">
-        <h3 className="min-w-0 text-base font-semibold leading-snug break-words">
-          {partida.game.name || "(sem nome)"}
-          {partida.quantity > 1 && (
-            <span className="ml-2 rounded-full bg-d-line px-2 py-0.5 text-xs font-medium text-d-muted">
-              ×{partida.quantity}
-            </span>
-          )}
-        </h3>
-        <time
-          dateTime={partida.date}
-          className="shrink-0 text-sm text-d-muted tabular-nums"
-        >
-          {formatarData(partida.date)}
-        </time>
-      </div>
-
-      {(detalhes || partida.incomplete) && (
-        <p className="mt-1 text-sm text-d-muted">
-          {detalhes}
-          {partida.incomplete && (
-            <span className="text-d-warn">{detalhes ? " · " : ""}incompleta</span>
-          )}
-        </p>
-      )}
-
-      {partida.players.length > 0 && (
-        <ul className="mt-3 flex flex-wrap gap-1.5">
-          {partida.players.map((jogador, i) => (
-            <li
-              key={`${jogador.userid}-${jogador.name}-${i}`}
-              className={
-                jogador.win
-                  ? "rounded-full bg-d-ok/15 px-2.5 py-1 text-sm font-medium text-d-ok"
-                  : "rounded-full bg-d-line px-2.5 py-1 text-sm"
-              }
-            >
-              {jogador.name || jogador.username || "?"}
-              {jogador.score && (
-                <span className="ml-1.5 text-d-muted tabular-nums">
-                  {jogador.score}
-                </span>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {partida.comments && (
-        <p className="mt-3 text-sm whitespace-pre-line text-d-muted">
-          {partida.comments}
-        </p>
-      )}
-    </li>
-  );
-}
-
 export function JogosApp() {
   const [username, setUsername] = useState(USUARIO_PADRAO);
   const [buscando, setBuscando] = useState(false);
@@ -108,6 +52,7 @@ export function JogosApp() {
   const [erro, setErro] = useState<string | null>(null);
   const [resultado, setResultado] = useState<ResultadoBusca | null>(null);
   const [visiveis, setVisiveis] = useState(TAMANHO_LOTE);
+  const [filtros, setFiltros] = useState<Filtros>(FILTROS_VAZIOS);
   const controllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
@@ -128,6 +73,7 @@ export function JogosApp() {
     setErro(null);
     setResultado(null);
     setVisiveis(TAMANHO_LOTE);
+    setFiltros(FILTROS_VAZIOS);
     setProgresso({ carregadas: 0, total: 0 });
 
     try {
@@ -149,7 +95,46 @@ export function JogosApp() {
     }
   }
 
-  const resumo = resultado ? resumir(resultado.partidas) : null;
+  const partidas = resultado?.partidas;
+  const filtradas = useMemo(
+    () => (partidas ? filtrarPartidas(partidas, filtros) : []),
+    [partidas, filtros]
+  );
+  const limites = useMemo(
+    () => (partidas ? limitesDeData(partidas) : null),
+    [partidas]
+  );
+  // As quantidades de cada lista respeitam os outros filtros (ex.: o período),
+  // mas não o próprio — senão marcar um item zeraria os demais da lista.
+  const opcoesLocais = useMemo(
+    () =>
+      partidas
+        ? listarLocais(
+            partidas,
+            filtrarPartidas(partidas, { ...filtros, locais: [] }),
+            filtros.locais
+          )
+        : [],
+    [partidas, filtros]
+  );
+  const opcoesJogadores = useMemo(
+    () =>
+      partidas
+        ? listarJogadores(
+            partidas,
+            filtrarPartidas(partidas, { ...filtros, jogadores: [] }),
+            filtros.jogadores
+          )
+        : [],
+    [partidas, filtros]
+  );
+  const resumo = resultado ? resumir(filtradas) : null;
+  const totalGeral = partidas ? resumir(partidas).totalPartidas : 0;
+
+  function alterarFiltros(novos: Filtros) {
+    setFiltros(novos);
+    setVisiveis(TAMANHO_LOTE);
+  }
 
   return (
     <div className="jogos mx-auto min-h-dvh max-w-2xl px-4 py-8">
@@ -206,34 +191,66 @@ export function JogosApp() {
             </p>
           ) : (
             <>
-              <dl className="grid grid-cols-2 gap-3">
+              <FiltrosPartidas
+                filtros={filtros}
+                onChange={alterarFiltros}
+                limites={limites}
+                opcoesLocais={opcoesLocais}
+                opcoesJogadores={opcoesJogadores}
+                mostradas={resumo.totalPartidas}
+                total={totalGeral}
+              />
+
+              <dl className="mt-4 grid grid-cols-2 gap-3">
                 <div className="rounded-xl border border-d-line bg-d-card p-4">
                   <dt className="text-sm text-d-muted">Partidas</dt>
-                  <dd className="mt-1 text-3xl font-semibold tabular-nums">
-                    {resumo.totalPartidas}
+                  <dd className="mt-1 flex flex-wrap items-baseline gap-x-2">
+                    <span className="text-3xl font-semibold tabular-nums">
+                      {resumo.totalPartidas}
+                    </span>
+                    <span className="text-sm text-d-muted tabular-nums">
+                      ({resumo.partidasDigitais}{" "}
+                      {resumo.partidasDigitais === 1 ? "digital" : "digitais"})
+                    </span>
                   </dd>
                 </div>
                 <div className="rounded-xl border border-d-line bg-d-card p-4">
                   <dt className="text-sm text-d-muted">Jogos diferentes</dt>
-                  <dd className="mt-1 text-3xl font-semibold tabular-nums">
-                    {resumo.jogosDiferentes}
+                  <dd className="mt-1 flex flex-wrap items-baseline gap-x-2">
+                    <span className="text-3xl font-semibold tabular-nums">
+                      {resumo.jogosDiferentes}
+                    </span>
+                    <span className="text-sm text-d-muted tabular-nums">
+                      ({resumo.jogosApenasDigitais} apenas{" "}
+                      {resumo.jogosApenasDigitais === 1 ? "digital" : "digitais"})
+                    </span>
                   </dd>
                 </div>
               </dl>
 
-              <ul className="mt-4 space-y-3">
-                {resultado.partidas.slice(0, visiveis).map((partida) => (
-                  <CartaoPartida key={partida.id} partida={partida} />
-                ))}
-              </ul>
+              <QuadroMarcos partidas={resultado.partidas} />
 
-              {visiveis < resultado.partidas.length && (
+              {filtradas.length === 0 ? (
+                <p className="mt-4 rounded-xl border border-d-line bg-d-card p-4 text-sm text-d-muted">
+                  Nenhuma partida dentro dos filtros selecionados.
+                </p>
+              ) : (
+                <ul className="mt-4 space-y-3">
+                  {filtradas.slice(0, visiveis).map((partida) => (
+                    <li key={partida.id}>
+                      <CartaoPartida partida={partida} />
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {visiveis < filtradas.length && (
                 <button
                   type="button"
                   onClick={() => setVisiveis((v) => v + TAMANHO_LOTE)}
                   className="mt-4 w-full rounded-xl border border-d-line bg-d-card px-4 py-3 text-base font-medium"
                 >
-                  Mostrar mais ({resultado.partidas.length - visiveis} restantes)
+                  Mostrar mais ({filtradas.length - visiveis} restantes)
                 </button>
               )}
             </>
