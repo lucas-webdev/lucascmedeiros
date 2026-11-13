@@ -43,6 +43,16 @@ export interface UltimoLancamento {
   obs: string;
 }
 
+export interface FaturaPrevista {
+  mes: string;
+  /** Ano da fatura; passa do ano da planilha quando há parcelas em janeiro seguinte. */
+  ano?: number;
+  /** `false` para meses sem aba na planilha (só projeção de parcelas). */
+  navegavel?: boolean;
+  total: number;
+  cartoes: { conta: string; total: number }[];
+}
+
 export interface Painel {
   mes: string;
   /** "YYYY-MM-DD" no fuso de São Paulo. */
@@ -55,6 +65,10 @@ export interface Painel {
   categorias: CategoriaPainel[];
   fixosPendentes: FixoPendente[];
   ultimos: UltimoLancamento[];
+  /** Todos os lançamentos do mês, do mais recente ao mais antigo. Ausente em caches antigos. */
+  lancamentos?: UltimoLancamento[];
+  /** Ausente em caches antigos. */
+  proximasFaturas?: FaturaPrevista[];
 }
 
 export interface PainelResposta {
@@ -71,10 +85,17 @@ export interface NovoLancamento {
   forma: Forma;
   conta: Conta;
   obs: string;
+  /** Só crédito. Com mais de 1, `valor` é o total e o backend gera uma linha por mês. */
+  parcelas?: number;
 }
 
 export interface LancamentoResposta {
-  lancamento: { aba: string; linha: number };
+  lancamento: {
+    aba: string;
+    linha: number;
+    /** Parcelas que não couberam na planilha do ano. */
+    foraDoAno?: number;
+  };
   painel: Painel;
 }
 

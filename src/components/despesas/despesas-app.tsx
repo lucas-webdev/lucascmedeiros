@@ -28,10 +28,12 @@ import {
   type NovoLancamento,
   type Painel,
 } from "@/lib/despesas-types";
+import { CategoriaSheet } from "./categoria-sheet";
 import { CategoriasLista } from "./categorias-lista";
 import { FixosSecao } from "./fixos-secao";
 import { LancarSheet } from "./lancar-sheet";
 import { PainelTopo } from "./painel-topo";
+import { ProximasFaturas } from "./proximas-faturas";
 import { ServiceWorkerRegister } from "./service-worker-register";
 import { TokenGate } from "./token-gate";
 import { UltimosSecao } from "./ultimos-secao";
@@ -41,6 +43,18 @@ interface Dados {
   painel: Painel;
   /** timestamp (ms) da última resposta do servidor */
   em: number;
+}
+
+function normalizar(texto: string): string {
+  return String(texto ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLowerCase();
+}
+
+function mesmaCategoria(a: string, b: string): boolean {
+  return normalizar(a) === normalizar(b);
 }
 
 function mesAtualDoAparelho(): string {
@@ -61,6 +75,7 @@ export function DespesasApp() {
 
   const [pendentes, setPendentes] = useState<LancamentoPendente[]>([]);
   const [sheetAberto, setSheetAberto] = useState(false);
+  const [categoriaAberta, setCategoriaAberta] = useState<string | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
 
   // Refs espelham o estado para handlers de eventos globais (online, visibilitychange).
@@ -261,7 +276,14 @@ export function DespesasApp() {
           mesDaData(lancamento.data) !== r.lancamento.aba
             ? ` (fatura ${lancamento.conta})`
             : "";
-        mostrarAviso(`Lançado em ${r.lancamento.aba}${fatura}`);
+        const nParcelas = lancamento.parcelas ?? 1;
+        const fora = r.lancamento.foraDoAno ?? 0;
+        mostrarAviso(
+          nParcelas > 1
+            ? `${nParcelas - fora}x lançadas a partir de ${r.lancamento.aba}${fatura}` +
+                (fora > 0 ? ` · ${fora} ficaram de fora (2027)` : "")
+            : `Lançado em ${r.lancamento.aba}${fatura}`
+        );
         setSheetAberto(false);
       } catch (e) {
         if (e instanceof DespesasApiError && e.tipo === "rede") {
@@ -360,12 +382,16 @@ export function DespesasApp() {
               podeProximo={idx < MESES.length - 1}
               onMes={mudarMes}
             />
-            <CategoriasLista categorias={dados.painel.categorias} />
+            <CategoriasLista categorias={dados.painel.categorias} onAbrir={setCategoriaAberta} />
             <FixosSecao fixos={dados.painel.fixosPendentes} />
             <UltimosSecao
               ultimos={dados.painel.ultimos}
               pendentes={pendentes}
               onDescartar={descartarPendente}
+            />
+            <ProximasFaturas
+              faturas={dados.painel.proximasFaturas ?? []}
+              onEscolher={irParaMes}
             />
           </>
         ) : (
@@ -442,6 +468,18 @@ export function DespesasApp() {
         >
           +
         </button>
+      )}
+
+      {categoriaAberta && dados && (
+        <CategoriaSheet
+          categoria={categoriaAberta}
+          mes={dados.painel.mes}
+          lancamentos={(dados.painel.lancamentos ?? dados.painel.ultimos).filter(
+            (l) => mesmaCategoria(l.categoria, categoriaAberta)
+          )}
+          completo={!!dados.painel.lancamentos}
+          onFechar={() => setCategoriaAberta(null)}
+        />
       )}
 
       {sheetAberto && (

@@ -45,6 +45,7 @@ jobs:
       - name: Build static export
         env:
           NEXT_PUBLIC_DESPESAS_API: ${{ secrets.DESPESAS_API_URL }}
+          NEXT_PUBLIC_DESPESAS_LETI_API: ${{ secrets.DESPESAS_LETI_API_URL }}
         run: npm run build
 
       - name: Install lftp

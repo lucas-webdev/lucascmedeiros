@@ -78,7 +78,11 @@ O CI do site não roda clasp. O deploy do backend é sempre manual.
 Respostas de erro vêm como `{ ok: false, erro }` com HTTP 200.
 
 - `GET {API}?token=…&mes=Outubro` → `{ ok, categorias, painel }` (`mes` opcional).
-- `POST {API}` com `Content-Type: text/plain;charset=utf-8` (o Apps Script não responde a preflight CORS) e corpo JSON `{ token, data, descricao, categoria, valor, forma, conta, obs, idLocal? }` → `{ ok, lancamento: { aba, linha }, painel }`.
+- `POST {API}` com `Content-Type: text/plain;charset=utf-8` (o Apps Script não responde a preflight CORS) e corpo JSON `{ token, data, descricao, categoria, valor, forma, conta, obs, parcelas?, idLocal? }` → `{ ok, lancamento: { aba, linha }, painel }`.
+
+O painel (`GET` e a resposta do `POST`) também traz `lancamentos` (todos do mês, mais recentes primeiro, usados na tela de cada categoria) e `proximasFaturas` (meses seguintes com gasto no crédito, com total por cartão).
+
+`parcelas` (2–36, só crédito) trata `valor` como o **total** da compra: o backend grava uma linha por parcela (`Descrição (2/5)`), uma em cada aba a partir do mês da fatura, dividindo em centavos (a sobra vai na 1ª). Parcelas além de dezembro não são gravadas e voltam em `lancamento.foraDoAno`.
 
 `idLocal` é opcional e serve para a fila offline: se o mesmo id chegar de novo, o backend devolve a linha já lançada (`lancamento.repetido: true`) em vez de duplicar. Os últimos 80 ids ficam nas Script Properties.
 
