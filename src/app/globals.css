@@ -2,6 +2,9 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Páginas que seguem o tema do sistema (/despesas, /jogos) não usam a classe .dark. */
+@custom-variant os-dark (@media (prefers-color-scheme: dark));
+
 @theme {
   --color-background: #fafafa;
   --color-foreground: #0a0a0a;

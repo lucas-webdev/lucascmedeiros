@@ -8,12 +8,14 @@ import {
   limitesDeData,
   listarJogadores,
   listarLocais,
+  temFiltroAtivo,
   type FiltrosPartidas as Filtros,
 } from "@/lib/jogos-filtros";
 import { resumir } from "@/lib/jogos-stats";
 import type { ProgressoBusca, ResultadoBusca } from "@/lib/jogos-types";
 import { CartaoPartida } from "./cartao-partida";
 import { FiltrosPartidas } from "./filtros-partidas";
+import { QuadroDigitais } from "./quadro-digitais";
 import { QuadroMarcos } from "./quadro-marcos";
 
 const CHAVE_USUARIO = "jogos:bgg-username";
@@ -202,25 +204,29 @@ export function JogosApp() {
               />
 
               <dl className="mt-4 grid grid-cols-2 gap-3">
-                <div className="rounded-xl border border-d-line bg-d-card p-4">
-                  <dt className="text-sm text-d-muted">Partidas</dt>
+                <div className="rounded-xl border border-blue-200 bg-blue-100/70 p-4 os-dark:border-blue-800/50 os-dark:bg-blue-900/40">
+                  <dt className="text-sm text-blue-950/70 os-dark:text-blue-200/80">
+                    Partidas
+                  </dt>
                   <dd className="mt-1 flex flex-wrap items-baseline gap-x-2">
                     <span className="text-3xl font-semibold tabular-nums">
                       {resumo.totalPartidas}
                     </span>
-                    <span className="text-sm text-d-muted tabular-nums">
+                    <span className="text-sm text-blue-950/70 tabular-nums os-dark:text-blue-200/80">
                       ({resumo.partidasDigitais}{" "}
                       {resumo.partidasDigitais === 1 ? "digital" : "digitais"})
                     </span>
                   </dd>
                 </div>
-                <div className="rounded-xl border border-d-line bg-d-card p-4">
-                  <dt className="text-sm text-d-muted">Jogos diferentes</dt>
+                <div className="rounded-xl border border-indigo-200 bg-indigo-100/70 p-4 os-dark:border-indigo-900/60 os-dark:bg-indigo-950/70">
+                  <dt className="text-sm text-indigo-950/70 os-dark:text-indigo-200/80">
+                    Jogos diferentes
+                  </dt>
                   <dd className="mt-1 flex flex-wrap items-baseline gap-x-2">
                     <span className="text-3xl font-semibold tabular-nums">
                       {resumo.jogosDiferentes}
                     </span>
-                    <span className="text-sm text-d-muted tabular-nums">
+                    <span className="text-sm text-indigo-950/70 tabular-nums os-dark:text-indigo-200/80">
                       ({resumo.jogosApenasDigitais} apenas{" "}
                       {resumo.jogosApenasDigitais === 1 ? "digital" : "digitais"})
                     </span>
@@ -228,7 +234,13 @@ export function JogosApp() {
                 </div>
               </dl>
 
-              <QuadroMarcos partidas={resultado.partidas} />
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <QuadroMarcos partidas={resultado.partidas} />
+                <QuadroDigitais
+                  partidas={filtradas}
+                  filtrado={temFiltroAtivo(filtros)}
+                />
+              </div>
 
               {filtradas.length === 0 ? (
                 <p className="mt-4 rounded-xl border border-d-line bg-d-card p-4 text-sm text-d-muted">

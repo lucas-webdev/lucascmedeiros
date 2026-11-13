@@ -6,9 +6,14 @@ import type { Partida } from "./jogos-types";
  * a grafia e os acentos não importam). Para incluir outra plataforma, basta
  * acrescentar o nome aqui.
  */
-const LOCAIS_DIGITAIS = new Set(
-  ["Board Game Arena", "BGA", "Online", "Tabletop Simulator"].map(chaveLocal)
-);
+export const NOMES_LOCAIS_DIGITAIS = [
+  "Board Game Arena",
+  "BGA",
+  "Online",
+  "Tabletop Simulator",
+] as const;
+
+const LOCAIS_DIGITAIS = new Set(NOMES_LOCAIS_DIGITAIS.map(chaveLocal));
 
 export function ehPartidaDigital(partida: Partida): boolean {
   return LOCAIS_DIGITAIS.has(chaveLocal(partida.location));
@@ -50,6 +55,86 @@ export function resumir(partidas: Partida[]): ResumoPartidas {
     jogosDiferentes: jogos.size,
     jogosApenasDigitais,
   };
+}
+
+export interface JogoApenasDigital {
+  id: number;
+  nome: string;
+  /** Soma das quantidades das partidas do jogo. */
+  partidas: number;
+  /** YYYY-MM-DD da primeira e da última partida ("" se nenhuma tiver data). */
+  primeira: string;
+  ultima: string;
+  /** Plataformas digitais em que o jogo foi jogado, como estão escritas no BGG. */
+  locais: string[];
+}
+
+/**
+ * Jogos cujas partidas (dentro das recebidas) aconteceram TODAS em plataformas
+ * digitais — a mesma definição de `ResumoPartidas.jogosApenasDigitais`, então
+ * a quantidade desta lista é sempre igual ao número mostrado no card. Ordena
+ * do mais jogado para o menos jogado e, no empate, por nome.
+ */
+export function listarJogosApenasDigitais(
+  partidas: Partida[]
+): JogoApenasDigital[] {
+  const jogos = new Map<
+    number,
+    {
+      nome: string;
+      partidas: number;
+      primeira: string;
+      ultima: string;
+      locais: Map<string, string>;
+      jogouForaDoDigital: boolean;
+    }
+  >();
+
+  for (const partida of partidas) {
+    const jogo = jogos.get(partida.game.id) ?? {
+      nome: "",
+      partidas: 0,
+      primeira: "",
+      ultima: "",
+      locais: new Map<string, string>(),
+      jogouForaDoDigital: false,
+    };
+
+    if (!ehPartidaDigital(partida)) jogo.jogouForaDoDigital = true;
+    if (!jogo.nome) jogo.nome = partida.game.name;
+    jogo.partidas += partida.quantity;
+    if (partida.date) {
+      if (!jogo.primeira || partida.date < jogo.primeira) jogo.primeira = partida.date;
+      if (!jogo.ultima || partida.date > jogo.ultima) jogo.ultima = partida.date;
+    }
+    const chave = chaveLocal(partida.location);
+    if (!jogo.locais.has(chave)) {
+      jogo.locais.set(chave, partida.location.trim().replace(/\s+/g, " "));
+    }
+
+    jogos.set(partida.game.id, jogo);
+  }
+
+  const apenasDigitais: JogoApenasDigital[] = [];
+  for (const [id, jogo] of jogos) {
+    if (jogo.jogouForaDoDigital) continue;
+    apenasDigitais.push({
+      id,
+      nome: jogo.nome,
+      partidas: jogo.partidas,
+      primeira: jogo.primeira,
+      ultima: jogo.ultima,
+      locais: [...jogo.locais.values()].sort((a, b) =>
+        a.localeCompare(b, "pt-BR", { sensitivity: "base" })
+      ),
+    });
+  }
+
+  return apenasDigitais.sort(
+    (a, b) =>
+      b.partidas - a.partidas ||
+      a.nome.localeCompare(b.nome, "pt-BR", { sensitivity: "base" })
+  );
 }
 
 /** "2026-10-30" → "30/10/2026" sem passar por Date (evita deslocamento de fuso). */
