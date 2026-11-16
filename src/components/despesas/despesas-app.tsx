@@ -281,7 +281,7 @@ export function DespesasApp() {
         mostrarAviso(
           nParcelas > 1
             ? `${nParcelas - fora}x lançadas a partir de ${r.lancamento.aba}${fatura}` +
-                (fora > 0 ? ` · ${fora} ficaram de fora (2027)` : "")
+                (fora > 0 ? ` · ${fora} ficaram de fora (limite de 12)` : "")
             : `Lançado em ${r.lancamento.aba}${fatura}`
         );
         setSheetAberto(false);

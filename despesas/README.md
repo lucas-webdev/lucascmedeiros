@@ -82,7 +82,9 @@ Respostas de erro vêm como `{ ok: false, erro }` com HTTP 200.
 
 O painel (`GET` e a resposta do `POST`) também traz `lancamentos` (todos do mês, mais recentes primeiro, usados na tela de cada categoria) e `proximasFaturas` (meses seguintes com gasto no crédito, com total por cartão).
 
-`parcelas` (2–36, só crédito) trata `valor` como o **total** da compra: o backend grava uma linha por parcela (`Descrição (2/5)`), uma em cada aba a partir do mês da fatura, dividindo em centavos (a sobra vai na 1ª). Parcelas além de dezembro não são gravadas e voltam em `lancamento.foraDoAno`.
+`parcelas` (2–36, só crédito) trata `valor` como o **total** da compra: o backend grava uma linha por parcela (`Descrição (2/5)`), uma em cada aba a partir do mês da fatura, dividindo em centavos (a sobra vai na 1ª).
+
+As abas são **cíclicas**: depois de Dezembro vem Janeiro do ano seguinte. Uma linha que cai em fatura de outro ano que não o do nome da planilha sai com `fatura <ano>` na observação (ex.: `app · fatura 2027`). É essa marca que diz, numa mesma aba, o que é sobra do ciclo anterior e o que já é do próximo; quem lançar à mão uma linha do ano seguinte precisa escrever a marca também. Cabe uma parcela por aba, então só as 12 primeiras são gravadas e o resto volta em `lancamento.foraDoAno`. Antes de renomear a planilha para o ano novo, apague as linhas antigas sem marca: a partir daí elas passam a contar como do ano novo.
 
 `idLocal` é opcional e serve para a fila offline: se o mesmo id chegar de novo, o backend devolve a linha já lançada (`lancamento.repetido: true`) em vez de duplicar. Os últimos 80 ids ficam nas Script Properties.
 

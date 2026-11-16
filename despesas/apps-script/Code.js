@@ -92,12 +92,22 @@ function registrarLancamento(idLocal, r) {
 
 const MAX_PARCELAS = 36;
 
+// Linha de fatura de outro ano que não o da planilha leva "fatura 2027" na observação.
+// É o que separa, numa mesma aba, o que sobrou do ciclo anterior do que já é do próximo.
+const RE_ANO_FATURA = /fatura\s+(20\d{2})\b/i;
+
+function anoDaLinha(obs, base) {
+  const m = String(obs || '').match(RE_ANO_FATURA);
+  return m ? Number(m[1]) : base;
+}
+
 /**
  * p = { data: 'YYYY-MM-DD', descricao, categoria, valor, forma, conta, obs?, mes?, parcelas?, idLocal? }
  * Se `mes` vier preenchido, ele manda. Senão o mês é calculado pela regra de corte.
  * `parcelas` > 1 (só crédito): `valor` é o TOTAL da compra. Grava uma linha por parcela,
- * uma em cada mês a partir do mês da fatura. Parcelas além de dezembro ficam de fora
- * (a planilha é anual) e voltam em `foraDoAno`.
+ * uma em cada mês a partir do mês da fatura. As abas são cíclicas: depois de Dezembro vem
+ * Janeiro do ano seguinte, e a linha sai marcada com "fatura <ano>". Só cabe uma parcela
+ * por aba, então parcelas além da 12ª ficam de fora e voltam em `foraDoAno`.
  */
 function lancarGasto(p) {
   const valor = Number(p.valor);
@@ -110,14 +120,15 @@ function lancarGasto(p) {
   if (!CONTAS.includes(p.conta)) throw new Error('conta inválida');
   if (!listarCategorias().includes(p.categoria)) throw new Error('categoria inválida');
 
-  const mes = p.mes || mesDestino(p.data, p.forma, p.conta);
+  const destino = faturaDestino(p.data, p.forma, p.conta, p.mes);
   const ss = SpreadsheetApp.getActive();
-  const inicio = MESES.indexOf(mes);
-  const gravaveis = Math.min(parcelas, MESES.length - inicio);
+  const base = anoDaPlanilha();
+  const gravaveis = Math.min(parcelas, MESES.length);
 
   // Confere todas as abas antes de gravar qualquer linha, pra não deixar parcelamento pela metade.
   for (let i = 0; i < gravaveis; i++) {
-    if (!ss.getSheetByName(MESES[inicio + i])) throw new Error(`aba "${MESES[inicio + i]}" não existe`);
+    const nome = MESES[(destino.mes + i) % 12];
+    if (!ss.getSheetByName(nome)) throw new Error(`aba "${nome}" não existe`);
   }
 
   const [, mm, dd] = p.data.split('-');
@@ -126,11 +137,18 @@ function lancarGasto(p) {
   let primeira = null;
 
   for (let i = 0; i < gravaveis; i++) {
-    const aba = ss.getSheetByName(MESES[inicio + i]);
+    const pos = destino.mes + i;
+    const nome = MESES[pos % 12];
+    const ano = destino.ano + Math.floor(pos / 12);
+    const aba = ss.getSheetByName(nome);
     const linha = proximaLinhaLivre(aba);
     const sufixo = parcelas > 1 ? ` (${i + 1}/${parcelas})` : '';
-    const obs = ['app', parcelas > 1 ? `total ${valor.toFixed(2).replace('.', ',')}` : '', p.obs]
-      .filter(Boolean).join(' · ');
+    const obs = [
+      'app',
+      parcelas > 1 ? `total ${valor.toFixed(2).replace('.', ',')}` : '',
+      ano !== base ? `fatura ${ano}` : '',
+      p.obs,
+    ].filter(Boolean).join(' · ');
 
     // Data e observação como texto, senão "1/3" vira data
     aba.getRange(linha, 1).setNumberFormat('@');
@@ -138,7 +156,7 @@ function lancarGasto(p) {
     aba.getRange(linha, 1, 1, 7).setValues([[
       `${dd}/${mm}`, descricao + sufixo, p.categoria, valores[i], p.forma, p.conta, obs,
     ]]);
-    if (!primeira) primeira = { aba: MESES[inicio], linha };
+    if (!primeira) primeira = { aba: nome, linha };
   }
 
   return { aba: primeira.aba, linha: primeira.linha, parcelas, foraDoAno: parcelas - gravaveis };
@@ -152,12 +170,19 @@ function dividirParcelas(total, n) {
   return Array.from({ length: n }, (_, i) => (base + (i === 0 ? resto : 0)) / 100);
 }
 
-function mesDestino(dataISO, forma, conta) {
+/** { mes: índice 0-11, ano } da fatura. Compra depois do corte em dezembro cai em janeiro do ano seguinte. */
+function faturaDestino(dataISO, forma, conta, mesForcado) {
   const d = new Date(`${dataISO}T12:00:00`);
+  const ano = d.getFullYear();
   let m = d.getMonth();
+  if (mesForcado) {
+    const i = MESES.indexOf(mesForcado);
+    if (i < 0) throw new Error(`aba "${mesForcado}" não existe`);
+    // Mês forçado anterior ao da compra só pode ser do ano seguinte.
+    return { mes: i, ano: i < m ? ano + 1 : ano };
+  }
   if (forma === 'Crédito' && d.getDate() > (CORTE[conta] || 31)) m += 1;
-  if (m > 11) throw new Error('compra cai na fatura de janeiro do próximo ano: crie a planilha de 2027');
-  return MESES[m];
+  return { mes: m % 12, ano: ano + Math.floor(m / 12) };
 }
 
 /** Primeira linha com B e D vazios entre a linha 4 e "TOTAL GASTOS". Se não houver, abre uma. */
@@ -246,53 +271,68 @@ function painel(mes) {
 }
 
 /**
- * Faturas dos meses depois de `mes` que tenham algum valor no crédito, por cartão.
- * Soma o que já está lançado nas abas futuras e PROJETA as parcelas que ainda não foram
- * lançadas: uma linha marcada "Parcela 1/5" (na observação) ou "Descrição (1/5)" gera as
- * parcelas 2..5 nos meses seguintes. Parcelas já presentes na aba do mês não são contadas
- * duas vezes. Meses depois de dezembro saem com `navegavel: false` (não há aba).
+ * Faturas depois de `mes` que tenham algum valor no crédito, por cartão.
+ * Soma o que já está lançado e PROJETA as parcelas que ainda não foram lançadas: uma linha
+ * marcada "Parcela 1/5" (na observação) ou "Descrição (1/5)" gera as parcelas 2..5 nos meses
+ * seguintes. Parcelas já presentes na aba do mês não são contadas duas vezes.
+ *
+ * As abas são cíclicas, então cada linha tem uma posição absoluta: meses desde janeiro do
+ * ano da planilha, usando o ano de "fatura <ano>" quando a linha tem essa marca.
  */
 function proximasFaturas(mes) {
   const ss = SpreadsheetApp.getActive();
-  const atual = MESES.indexOf(mes);
-  const ano = anoDaPlanilha();
+  const base = anoDaPlanilha();
+  const anoHoje = Number(Utilities.formatDate(new Date(), 'America/Sao_Paulo', 'yyyy'));
+  const idx = MESES.indexOf(mes);
 
-  const linhasPorMes = MESES.map(m => {
-    const aba = ss.getSheetByName(m);
-    return aba ? lerCredito(aba) : [];
+  const linhas = [];
+  const anosDaAbaVista = [];
+  MESES.forEach((nome, i) => {
+    const aba = ss.getSheetByName(nome);
+    if (!aba) return;
+    lerCredito(aba).forEach(l => {
+      const ano = anoDaLinha(l.obs, base);
+      if (i === idx) anosDaAbaVista.push(ano);
+      linhas.push({ linha: l, pos: (ano - base) * 12 + i });
+    });
   });
 
+  // A aba vista vale para o ano corrente, a não ser que só tenha linhas de um ano à frente.
+  const menorAno = anosDaAbaVista.length ? Math.min.apply(null, anosDaAbaVista) : anoHoje;
+  const atual = (Math.max(anoHoje, menorAno) - base) * 12 + idx;
+
   const vistos = {};
-  linhasPorMes.forEach((linhas, i) => linhas.forEach(l => {
-    const p = parcelaDe(l);
-    if (p) vistos[`${i}|${p.base}|${l.conta}|${p.k}|${p.n}`] = true;
-  }));
+  linhas.forEach(({ linha, pos }) => {
+    const p = parcelaDe(linha);
+    if (p) vistos[`${pos}|${p.base}|${linha.conta}|${p.k}|${p.n}`] = true;
+  });
 
   const porMes = {};
-  const somar = (i, conta, valor) => {
-    porMes[i] = porMes[i] || {};
-    porMes[i][conta] = (porMes[i][conta] || 0) + valor;
+  const somar = (pos, conta, valor) => {
+    porMes[pos] = porMes[pos] || {};
+    porMes[pos][conta] = (porMes[pos][conta] || 0) + valor;
   };
 
-  linhasPorMes.forEach((linhas, i) => linhas.forEach(l => {
-    if (i > atual) somar(i, l.conta, l.valor);
-    const p = parcelaDe(l);
+  linhas.forEach(({ linha, pos }) => {
+    if (pos > atual) somar(pos, linha.conta, linha.valor);
+    const p = parcelaDe(linha);
     if (!p) return;
     for (let j = 1; j <= p.n - p.k; j++) {
-      const alvo = i + j;
-      const chave = `${alvo}|${p.base}|${l.conta}|${p.k + j}|${p.n}`;
+      const alvo = pos + j;
+      const chave = `${alvo}|${p.base}|${linha.conta}|${p.k + j}|${p.n}`;
       if (alvo <= atual || vistos[chave]) continue;
       vistos[chave] = true;
-      somar(alvo, l.conta, l.valor);
+      somar(alvo, linha.conta, linha.valor);
     }
-  }));
+  });
 
-  return Object.keys(porMes).map(Number).sort((a, b) => a - b).map(i => {
-    const cartoes = Object.keys(porMes[i]).map(conta => ({ conta, total: arred(porMes[i][conta]) }));
+  return Object.keys(porMes).map(Number).sort((a, b) => a - b).map(pos => {
+    const cartoes = Object.keys(porMes[pos]).map(conta => ({ conta, total: arred(porMes[pos][conta]) }));
     return {
-      mes: MESES[i % 12],
-      ano: ano + Math.floor(i / 12),
-      navegavel: i < MESES.length,
+      mes: MESES[((pos % 12) + 12) % 12],
+      ano: base + Math.floor(pos / 12),
+      // Passou de 12 meses, o mês repete uma aba que já está na lista.
+      navegavel: pos - atual < MESES.length,
       total: arred(cartoes.reduce((s, c) => s + c.total, 0)),
       cartoes,
     };
